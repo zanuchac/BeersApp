@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/0faa1699-aa47-480f-b16c-70848073c98e/resourceGroups/Default-Web-SoutheastAsia/providers/Microsoft.Web/sites/BeerWebApp",
+    "appService.deploySubpath": "."
+}
