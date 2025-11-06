@@ -52,6 +52,7 @@ app.get("/hello",(req,res) => {
         if(err) throw err
 
         console.log('Connected Successfully')
+        res.send("Hello แผ่นดิน ธารธารา บ้านสวน และชาวโลก!")
     });
 
     res.send("Hello NodseJS!")
