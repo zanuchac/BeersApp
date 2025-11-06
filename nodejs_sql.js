@@ -1,7 +1,7 @@
 //Open Call Express
 const express = require('express')
 const bodyParser = require('body-parser')
-const mysql = require('mysql');
+//const mysql = require('mysql');
 
 const app = express()
 const port = process.env.PORT || 5000;
@@ -14,6 +14,7 @@ app.use(bodyParser.json())
 app.set('view engine', 'ejs')
 
 //MySQL Connect phpMyAdmin
+/*
 const pool = mysql.createPool({
     connectionLimit : 10,
     connectTimeout : 20,
@@ -21,7 +22,7 @@ const pool = mysql.createPool({
     user: 'root',
     password : '',
     database : 'nodejs_beers' // Connect Database from bears.sql (Import to phpMyAdmin)
-})
+})*/
 
 var obj = {} // Global Variable
 
@@ -30,6 +31,7 @@ app.get("/hello",(req,res) => {
     res.send("Hello NodeJS!")
 })
 
+/*
 //GET ()
 app.get('', (req,res) => {
     pool.getConnection((error, connection) => { //err คือ connect ไม่ได้ or connection คือ connect ได้
@@ -166,7 +168,7 @@ app.put('/update', (req,res) => {
 })
 
 //UPDATE `beers` SET `name` = 'new Chang' WHERE `beers`.`id` = 123;
-
+*/
 app.listen(port, () =>
     console.log("isten on port : ?", port)
 )
