@@ -1,17 +1,17 @@
 //Open Call Express
 const express = require('express')
-//const bodyParser = require('body-parser')
-//const mysql = require('mysql');
+const sql = require('mssql');
 
 const app = express()
 const port = process.env.PORT || 3000;
+// view
+app.set('view engine', 'ejs')
 
+//const bodyParser = require('body-parser')
+//const mysql = require('mysql');
 // ใช้คำสั่ง bodyParser.urlencoded ที่ให้สามารถรับข้อมูล x-www-form-urlencoded
 //app.use(bodyParser.urlencoded({extended: false}))
 //app.use(bodyParser.json())
-
-// view
-app.set('view engine', 'ejs')
 
 //MySQL Connect phpMyAdmin
 /*
@@ -24,10 +24,36 @@ const pool = mysql.createPool({
     database : 'nodejs_beers' // Connect Database from bears.sql (Import to phpMyAdmin)
 })*/
 
+ var Connection = require('tedious').Connection;  
+
+ var config = {  
+    server: 'beerdemoappserver.database.windows.net',  //update me
+    authentication: {
+        type: 'default',
+        options: {
+        userName: 'sadmin', //update me
+        password: 'BeerDemoApp!'  //update me
+        }
+    },
+    options: {
+        // If you are on Microsoft Azure, you need encryption:
+        encrypt: true,
+        database: 'beerdemoapp'  //update me
+    }
+};  
+
 var obj = {} // Global Variable
 
 //Back-End NodeJS Display
 app.get("/hello",(req,res) => {
+
+    var connection = new Connection(config);  
+    connection.connect(function(err){
+        if(err) throw err
+
+        console.log('Connected Successfully')
+    });
+
     res.send("Hello NodseJS!")
 })
 
