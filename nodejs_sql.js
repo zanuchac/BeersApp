@@ -25,6 +25,11 @@ const pool = mysql.createPool({
 
 var obj = {} // Global Variable
 
+//Back-End NodeJS Display
+app.get("/hello",(req,res) => {
+    res.send("Hello NodeJS!")
+})
+
 //GET ()
 app.get('', (req,res) => {
     pool.getConnection((error, connection) => { //err คือ connect ไม่ได้ or connection คือ connect ได้
