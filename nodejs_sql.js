@@ -28,7 +28,7 @@ var obj = {} // Global Variable
 
 //Back-End NodeJS Display
 app.get("/hello",(req,res) => {
-    res.send("Hello NodeJS!")
+    res.send("Hello NodseJS!")
 })
 
 /*
