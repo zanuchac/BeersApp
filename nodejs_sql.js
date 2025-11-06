@@ -1,14 +1,14 @@
 //Open Call Express
 const express = require('express')
-const bodyParser = require('body-parser')
+//const bodyParser = require('body-parser')
 //const mysql = require('mysql');
 
 const app = express()
 const port = process.env.PORT || 3000;
 
 // ใช้คำสั่ง bodyParser.urlencoded ที่ให้สามารถรับข้อมูล x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
+//app.use(bodyParser.urlencoded({extended: false}))
+//app.use(bodyParser.json())
 
 // view
 app.set('view engine', 'ejs')
