@@ -55,7 +55,7 @@ app.get("/hello",(req,res) => {
         res.send("Hello แผ่นดิน ธารธารา บ้านสวน และชาวโลก!")
     });
 
-    res.send("Hello NodseJS!")
+    //res.send("Hello NodseJS!")
 })
 
 /*
