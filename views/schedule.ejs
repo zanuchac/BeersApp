@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตารางการติดตั้งผ้าม่านลูกค้า</title>
+    <!-- ลิงก์ไปยังไฟล์ CSS ที่รวบรวมไว้ -->
+    <!-- แก้ไขลิงก์ CSS ตามที่คุณต้องการ -->
+    <link rel="stylesheet" href="/css/stylesheet.css"> 
+</head>
+<body>
+
+    <div class="dashboard-layout">
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">Curtain Schedule</div>
+            <nav>
+                <a href="/schedule" class="nav-item active">ตารางติดตั้ง</a>
+                <a href="#" class="nav-item">รายงาน</a>
+            </nav>
+        </div>
+
+        <!-- Main Content (ตาราง) -->
+        <div class="main-content">
+            <div class="schedule-header">
+                <h2>ตารางงานติดตั้งประจำสัปดาห์</h2>
+                <div class="controls">
+                    <select id="team-filter">
+                        <option value="all">ทีมช่างทั้งหมด</option>
+                        <option value="team-a">ทีมช่าง A</option>
+                        <option value="team-b">ทีมช่าง B</option>
+                        <!-- เพิ่มทีมอื่นๆ -->
+                    </select>
+                    <button id="prev-week-btn" class="nav-btn">ก่อนหน้า</button>
+                    <span id="current-week-range"></span>
+                    <button id="next-week-btn" class="nav-btn">ถัดไป</button>
+                    <button class="add-btn">+ เพิ่มงานใหม่</button>
+                </div>
+            </div>
+
+            <% if (dbError) { %>
+                <div class="error-message">
+                    <strong>เกิดข้อผิดพลาด:</strong> <%= dbError %>
+                </div>
+            <% } %>
+
+            <div class="table-container">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>เวลา</th>
+                            <th>จันทร์ 00/00</th>
+                            <th>อังคาร 00/00</th>
+                            <th>พุธ 00/00</th>
+                            <th>พฤหัสบดี 00/00</th>
+                            <th>ศุกร์ 00/00</th>
+                            <th>เสาร์ 00/00</th>
+                            <th>อาทิตย์ 00/00</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body">
+                        <!-- ตารางจะถูกสร้างโดย JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Sidebar (งานที่กำลังจะมาถึง) -->
+        <div class="right-sidebar">
+            <h3>งานที่กำลังจะมาถึง</h3>
+            <div id="upcoming-jobs-list" class="job-list">
+                <!-- รายการงานจะถูกสร้างโดย JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 1. ต้องกำหนดตัวแปร liveJobs ก่อนไฟล์ schedule_page.js จะถูกโหลด -->
+    <script>
+        const liveJobs = <%- JSON.stringify(jobs) %>;
+        console.log(liveJobs);
+    </script>
+    
+
+    <!-- 2. โหลดไฟล์ JavaScript หลัก ซึ่งตอนนี้สามารถเข้าถึง liveJobs ได้แล้ว -->
+    <script src="/js/schedule.js"></script> 
+
+</body>
+</html>

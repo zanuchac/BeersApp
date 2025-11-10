@@ -2,7 +2,7 @@
 const express = require('express')
 const path = require('path'); // Required for path.join
 const app = express()
-const sql = require('mssql');
+const sql = require('mssql'); // Import mssql module
 const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser')
 
@@ -12,9 +12,9 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-// SQL Server (MSSQL) Configuration
 const Connection = require('tedious').Connection;  
 
+// SQL Server (MSSQL) Configuration
 const config = {  
     server: 'beerdemoappserver.database.windows.net',  //update me
     authentication: {
@@ -25,9 +25,9 @@ const config = {  
         }
     },
     options: {
-        // If you are on Microsoft Azure, you need encryption:
-        encrypt: true,
-        database: 'beerdemoapp'  //update me
+        encrypt: true, // If you are on Microsoft Azure, you need encryption
+        database: 'beerdemoapp',  //update me
+        trustServerCertificate: true // Recommended for development on local machine
     }
 };  
 
@@ -41,19 +41,14 @@ pool.connect(err => {
     }
 });
 
-
 var obj = {} // Global Variable
 
 // -------------------------------------------------------------------
-// 1. ENDPOINT: แสดงหน้าหลักตารางนัดหมาย (/schedule)
+// 1. ENDPOINT: แสดงหน้าหลักตารางนัดหมาย (/schedule) - แก้ไขให้ดึงข้อมูล
 // -------------------------------------------------------------------
-app.get("/schedule", async (req,res) => {
-    
-    sql.connect(config).then(pool => {
-        console.log('xxx');
-
-        try {
-       // *** ใช้ 'await' เพื่อรอผลลัพธ์จากการ Query จากฐานข้อมูล ***
+app.get("/schedule", async (req,res) => { // <--- ต้องมี 'async' เพื่อใช้ 'await' ด้านใน
+    try {
+        // *** ใช้ 'await' เพื่อรอผลลัพธ์จากการ Query จากฐานข้อมูล ***
         const result = await pool.request().query( 
             `SELECT 
                 orderid as id, 
@@ -74,30 +69,21 @@ app.get("/schedule", async (req,res) => {
             jobs: result.recordset || [],
             dbError: null // ส่งค่า null เมื่อไม่มี error
         });
-   
 
     } catch (err) {
         console.error('Database Query Error:', err);
         // กรณี Query ล้มเหลว ส่งหน้า schedule พร้อม error message ไป
         res.render('schedule', { 
             jobs: [], 
-            dbError: 'ไม่สามารถดึงข้อมูลตารางงานได้ กรุณาตรวจสอบการเชื่อมต่อฐานข้อมูล'
+            dbError: 'ไม่สามารถดึงข้อมูลตารางงานได้ กรุณาตรวจสอบการเชื่อมต่อฐานข้อมูล: ' + err.message
         });
     }
-
-
-
-    })
-})
+});
 
 // -------------------------------------------------------------------
 // 2. ENDPOINT: แสดงหน้าเว็บย่อย (Partial View) สำหรับเพิ่มงานใหม่ (/schedule/input)
 // -------------------------------------------------------------------
-// Route นี้จะถูกเรียกด้วย AJAX/Fetch เพื่อแสดงใน Modal
 app.get("/schedule/input", (req, res) => {
-    // ใช้ res.render() โดยตรงเพื่อส่ง EJS file กลับไป
-    // ไฟล์ input_schedule.ejs จะถูกส่งกลับไปในรูปแบบ HTML
-    console.log('tst');
     res.render('input_schedule');
 })
 
@@ -108,6 +94,7 @@ app.post("/schedule/new", (req, res) => {
     // ข้อมูลที่ส่งมาจากฟอร์ม (Form Data) จะอยู่ใน req.body
     const newJobData = req.body;    
     // แสดงข้อมูลที่ได้รับ
+																																																  
     console.log("Received new job data:", newJobData);
     // ********** โค้ดส่วนนี้คือตัวอย่างการบันทึกข้อมูล **********    
     // ตัวอย่างการใช้ mssql หรือ tedious เพื่อบันทึกข้อมูลจริง

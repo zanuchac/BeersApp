@@ -1,0 +1,77 @@
+<% 
+// **NOTE:** ข้อมูลเหล่านี้ควรถูกส่งมาจาก Express Server เมื่อเรียก res.render('input_schedule', data)
+// แต่สำหรับ EJS ไฟล์เดี่ยวนี้ เราจะกำหนดค่าเริ่มต้นไว้
+const teams = [{id: 'team-a', name: 'ทีมช่าง A'}, {id: 'team-b', name: 'ทีมช่าง B'}, {id: 'team-c', name: 'ทีมช่าง C'}];
+const timeSlots = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+const jobTypes = ["ติดตั้งผ้าม่าน", "วัดหน้างาน", "บริการหลังการขาย", "งานซ่อม"];
+%>
+
+<div class="input-form-container">
+    <header class="form-header">
+        <h2>📅 บันทึกงานติดตั้ง/นัดหมายใหม่</h2>
+        <p>กรุณากรอกข้อมูลให้ครบถ้วนเพื่อจัดสรรงานให้กับทีมช่าง</p>
+    </header>
+
+    <form id="new-job-form" action="/schedule/new" method="POST">
+        
+        <div class="form-group half-width">
+            <label for="orderId">รหัสคำสั่งซื้อ:</label>
+            <input type="text" id="orderId" name="orderId" placeholder="เช่น ORD-20251101-005" required>
+        </div>
+
+        <div class="form-group half-width">
+            <label for="customerName">ชื่อลูกค้า / โครงการ:</label>
+            <input type="text" id="customerName" name="customerName" required>
+        </div>
+        
+        <div class="form-group full-width">
+            <label for="address">ที่อยู่ติดตั้งโดยละเอียด:</label>
+            <textarea id="address" name="address" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group half-width">
+            <label for="appointmentDate">วันที่นัดหมาย:</label>
+            <input type="date" id="appointmentDate" name="appointmentDate" required>
+        </div>
+
+        <div class="form-group half-width">
+            <label for="appointmentTime">ช่วงเวลา:</label>
+            <select id="appointmentTime" name="appointmentTime" required>
+                <option value="" disabled selected>-- เลือกเวลา --</option>
+                <% timeSlots.forEach(time => { %>
+                    <option value="<%= time %>"><%= time %></option>
+                <% }); %>
+            </select>
+        </div>
+        
+        <div class="form-group half-width">
+            <label for="jobType">ประเภทงาน:</label>
+            <select id="jobType" name="jobType" required>
+                <option value="" disabled selected>-- เลือกประเภทงาน --</option>
+                <% jobTypes.forEach(type => { %>
+                    <option value="<%= type %>"><%= type %></option>
+                <% }); %>
+            </select>
+        </div>
+
+        <div class="form-group half-width">
+            <label for="team">ทีมช่างผู้รับผิดชอบ:</label>
+            <select id="team" name="team" required>
+                <option value="" disabled selected>-- เลือกทีมช่าง --</option>
+                <% teams.forEach(team => { %>
+                    <option value="<%= team.id %>"><%= team.name %></option>
+                <% }); %>
+            </select>
+        </div>
+        
+        <div class="form-group full-width">
+            <label for="notes">หมายเหตุพิเศษ / ข้อมูลทีมช่าง:</label>
+            <textarea id="notes" name="notes" rows="4"></textarea>
+        </div>
+        
+        <div class="form-actions full-width">
+            <button type="submit" class="submit-btn">บันทึกงานลงตาราง</button>
+            <button type="button" class="cancel-btn" onclick="document.getElementById('form-modal').remove()">ยกเลิก</button>
+        </div>
+    </form>
+</div>
