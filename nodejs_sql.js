@@ -50,6 +50,7 @@ app.get("/", async (req,res) => {
 // 1. ENDPOINT: แสดงหน้าหลักตารางนัดหมาย (/schedule) - แก้ไขให้ดึงข้อมูล
 // -------------------------------------------------------------------
 app.get("/schedule", async (req,res) => { // <--- ต้องมี 'async' เพื่อใช้ 'await' ด้านใน
+        console.log('xxxxxxxxxxxxx Loading Database xxxxxxxxxxx')
     try {
         // *** ใช้ 'await' เพื่อรอผลลัพธ์จากการ Query จากฐานข้อมูล ***
         const result = await pool.request().query( 
