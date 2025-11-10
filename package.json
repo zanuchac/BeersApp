@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "nodejs_sql.js",
   "scripts": {
-    "start": "node nodejs_server.js"
+    "start": "node nodejs_sql.js"
   },
   "author": "",
   "license": "ISC",
