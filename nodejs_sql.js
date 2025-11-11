@@ -1,175 +1,167 @@
-//Open Call Express
+// Import required modules
 const express = require('express')
-const path = require('path'); // Required for path.join
+const path = require('path');
 const app = express()
-const sql = require('mssql'); // Import mssql module
+const sql = require('mssql'); 
 const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser')
 
-// view
+// View setup (EJS)
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-const Connection = require('tedious').Connection;  
-
 // SQL Server (MSSQL) Configuration
-const config = {  
-    server: 'beerdemoappserver.database.windows.net',  //update me
-    authentication: {
-        type: 'default',
-        options: {
-        userName: 'sadmin', //update me
-        password: 'BeerDemoApp!'  //update me
-        }
-    },
-    options: {
-        encrypt: true, // If you are on Microsoft Azure, you need encryption
-        database: 'beerdemoapp',  //update me
-        trustServerCertificate: true // Recommended for development on local machine
-    }
-};  
+const config = {
+    server: 'beerdemoappserver.database.windows.net',    // Update your server
+    authentication: {
+        type: 'default',
+        options: {
+        userName: 'sadmin', // Update your username
+        password: 'BeerDemoApp!'    // Update your password
+        }
+    },
+    options: {
+        encrypt: true, // Required for Azure/Cloud deployment
+        database: 'beerdemoapp',    // Update your database name
+        trustServerCertificate: true // Recommended for development
+    }
+};
 
-// สร้าง Connection Pool ทันทีที่เริ่มต้นแอป
+// Initialize Connection Pool
 const pool = new sql.ConnectionPool(config);
 pool.connect(err => {
-    if (err) {
-        console.error('Database Connection Pool Creation Failed:', err);
-    } else {
-        console.log('Database Connection Pool Created Successfully');
-    }
+    if (err) {
+        console.error('Database Connection Pool Creation Failed:', err);
+    } else {
+        console.log('Database Connection Pool Created Successfully');
+    }
 });
 
-var obj = {} // Global Variable
-
+// Root Endpoint
 app.get("/", async (req,res) => {
-    res.render('Index')
+    res.render('Index')
 })
 
 // -------------------------------------------------------------------
-// 1. ENDPOINT: แสดงหน้าหลักตารางนัดหมาย (/schedule) - อัปเดต SELECT
+// 1. READ: Display schedule table (/schedule)
 // -------------------------------------------------------------------
 app.get("/schedule", async (req,res) => { 
-    try {
-        const result = await pool.request().query( 
-            `SELECT 
-                orderid as id, 
-                CustomerName as customer, 
-                Team as team, 
-                Status as status,
+    try {
+        const result = await pool.request().query( 
+            `SELECT 
+                orderid as id, 
+                CustomerName as customer, 
+                Team as team, 
+                Status as status,
                 Address as address, 
-                FORMAT(AppointmentDate, 'yyyy-MM-dd') as date, 
-                AppointmentTime as time, 
-                JobType as jobType 
-            FROM schedule 
-            ORDER BY AppointmentDate, AppointmentTime`
-        );
-        
-        console.log('load data from database completed')
+                FORMAT(AppointmentDate, 'yyyy-MM-dd') as date, 
+                AppointmentTime as time, 
+                JobType as jobType 
+            FROM schedule 
+            ORDER BY AppointmentDate, AppointmentTime`
+        );
+        
+        console.log('load data from database completed');
 
-        // ส่งข้อมูลที่ดึงมา (recordset) ไปยังหน้า EJS
-        res.render('schedule', { 
-            jobs: result.recordset || [],
-            dbError: null 
-        });
+        res.render('schedule', { 
+            jobs: result.recordset || [],
+            dbError: null 
+        });
 
-    } catch (err) {
-        console.error('Database Query Error:', err);
-        // กรณี Query ล้มเหลว ส่งหน้า schedule พร้อม error message ไป
-        res.render('schedule', { 
-            jobs: [], 
-            dbError: 'ไม่สามารถดึงข้อมูลตารางงานได้ กรุณาตรวจสอบการเชื่อมต่อฐานข้อมูล: ' + err.message
-        });
-    }
+    } catch (err) {
+        console.error('Database Query Error:', err);
+        res.render('schedule', { 
+            jobs: [], 
+            dbError: 'ไม่สามารถดึงข้อมูลตารางงานได้ กรุณาตรวจสอบการเชื่อมต่อฐานข้อมูล: ' + err.message
+        });
+    }
 });
 
 // -------------------------------------------------------------------
-// 1.1 ENDPOINT: ดึงข้อมูลแบบ JSON สำหรับ Client-side Refresh - อัปเดต SELECT
+// 1.1 READ: JSON data for client-side refresh
 // -------------------------------------------------------------------
 app.get('/schedule/data', async(req, res) => {
-    try {
-        const result = await pool.request().query( 
-            `SELECT 
-                orderid as id, 
-                CustomerName as customer, 
-                Team as team, 
-                Status as status, 
+    try {
+        const result = await pool.request().query( 
+            `SELECT 
+                orderid as id, 
+                CustomerName as customer, 
+                Team as team, 
+                Status as status, 
                 Address as address,
-                FORMAT(AppointmentDate, 'yyyy-MM-dd') as date, 
-                AppointmentTime as time, 
-                JobType as jobType 
-            FROM schedule 
-            ORDER BY AppointmentDate, AppointmentTime`
-        );
-        
-        console.log('load data from database completed')
+                FORMAT(AppointmentDate, 'yyyy-MM-dd') as date, 
+                AppointmentTime as time, 
+                JobType as jobType 
+            FROM schedule 
+            ORDER BY AppointmentDate, AppointmentTime`
+        );
+        
+        console.log('load data from database completed')
 
-        res.json({ 
-            success: true,
-            jobs: result.recordset || [] 
-        });
+        res.json({ 
+            success: true,
+            jobs: result.recordset || [] 
+        });
 
-    } catch (err) {
-        console.error('Database Query Error:', err);
-        res.status(500).json({ 
-            success: false,
-            message: 'ไม่สามารถดึงข้อมูลตารางงานได้: ' + err.message
-        });
-    }
+    } catch (err) {
+        console.error('Database Query Error:', err);
+        res.status(500).json({ 
+            success: false,
+            message: 'ไม่สามารถดึงข้อมูลตารางงานได้: ' + err.message
+        });
+    }
 });
 
 // -------------------------------------------------------------------
-// 2. ENDPOINT: แสดงหน้าเว็บย่อย (Partial View) สำหรับเพิ่มงานใหม่ (/schedule/input)
+// 2. VIEW: Display input form
 // -------------------------------------------------------------------
 app.get("/schedule/input", (req, res) => {
-    console.log('testt')
-    res.render('input_schedule');
+    res.render('input_schedule');
 })
 
 // -------------------------------------------------------------------
-// 3. ENDPOINT: รับข้อมูล POST จากฟอร์มเพิ่มงานใหม่ (/schedule/new) - อัปเดต INSERT
+// 3. CREATE: Insert new job (/schedule/new)
 // -------------------------------------------------------------------
-app.post("/schedule/new", (req, res) => {
-    const newJobData = req.body;    
-    
-    console.log("Received new job data:", newJobData);
-    
-    // ตรวจสอบข้อมูลเบื้องต้น
+app.post("/schedule/new", async (req, res) => {
+    const newJobData = req.body;     
+    
+    console.log("Received new job data:", newJobData);
+    
     if (!newJobData.orderId || !newJobData.customerName) {
-         return res.status(400).send({ message: 'กรุณากรอก Order ID และชื่อลูกค้าให้ครบถ้วน', success: false });
+        return res.status(400).send({ message: 'กรุณากรอก Order ID และชื่อลูกค้าให้ครบถ้วน', success: false });
     }
 
-    sql.connect(config).then(pool => {
-        return pool.request()
-            .input('orderId', sql.NVarChar, newJobData.orderId)
-            .input('customerName', sql.NVarChar, newJobData.customerName)
-            .input('address', sql.NVarChar, newJobData.address) // NEW: เพิ่ม address
-            .input('appointmentDate', sql.Date, newJobData.appointmentDate)
-            .input('appointmentTime', sql.NVarChar, newJobData.appointmentTime)
-            .input('jobType', sql.NVarChar, newJobData.jobType)
-            .input('team', sql.NVarChar, newJobData.team)
-            .input('status', sql.NVarChar, newJobData.status || 'scheduled') // NEW: ใช้ status จาก client หรือ default เป็น 'scheduled'
-            
-            .query('INSERT INTO [Schedule] (OrderId, CustomerName, Address, AppointmentDate, AppointmentTime, JobType, Team, Status) VALUES (@orderId, @customerName, @address, @appointmentDate, @appointmentTime, @jobType, @team, @status)');
-    }).then(result => {
-        console.log('Job saved successfully.');
-        res.status(201).send({ message: 'บันทึกงานใหม่สำเร็จ', success: true, jobId: newJobData.orderId });
-    }).catch(err => {
-        console.error('Database insertion error:', err);
-        res.status(500).send({ message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + err.message, success: false });
-    });
+    try {
+        await pool.request() // Use Connection Pool
+            .input('orderId', sql.NVarChar, newJobData.orderId)
+            .input('customerName', sql.NVarChar, newJobData.customerName)
+            .input('address', sql.NVarChar, newJobData.address) 
+            .input('appointmentDate', sql.Date, newJobData.appointmentDate)
+            .input('appointmentTime', sql.NVarChar, newJobData.appointmentTime)
+            .input('jobType', sql.NVarChar, newJobData.jobType)
+            .input('team', sql.NVarChar, newJobData.team)
+            .input('status', sql.NVarChar, newJobData.status || 'scheduled')
+            
+            .query('INSERT INTO [Schedule] (OrderId, CustomerName, Address, AppointmentDate, AppointmentTime, JobType, Team, Status) VALUES (@orderId, @customerName, @address, @appointmentDate, @appointmentTime, @jobType, @team, @status)');
+
+        console.log('Job saved successfully.');
+        res.status(201).send({ message: 'บันทึกงานใหม่สำเร็จ', success: true, jobId: newJobData.orderId });
+    } catch (err) {
+        console.error('Database insertion error:', err);
+        res.status(500).send({ message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + err.message, success: false });
+    }
 })
 
 
 // -------------------------------------------------------------------
-// 4. ENDPOINT: รับข้อมูล POST จากฟอร์มแก้ไขงาน (/schedule/update) - NEW
+// 4. UPDATE: Update existing job (/schedule/update)
 // -------------------------------------------------------------------
 app.post("/schedule/update", async (req, res) => {
     const updatedJobData = req.body;
     console.log("Received job update data:", updatedJobData);
 
-    // OrderId คือ field ที่ใช้เป็น Primary Key ใน DB
     const orderId = updatedJobData.orderId || updatedJobData.id; 
 
     if (!orderId) {
@@ -177,8 +169,7 @@ app.post("/schedule/update", async (req, res) => {
     }
 
     try {
-        const pool = await sql.connect(config);
-        const result = await pool.request()
+        const result = await pool.request() // Use Connection Pool
             .input('orderId', sql.NVarChar, orderId)
             .input('customerName', sql.NVarChar, updatedJobData.customerName)
             .input('address', sql.NVarChar, updatedJobData.address)
@@ -200,9 +191,8 @@ app.post("/schedule/update", async (req, res) => {
                 WHERE OrderId = @orderId
             `);
         
-        // rowsAffected[0] จะบอกจำนวนแถวที่ได้รับผลกระทบ
         if (result.rowsAffected[0] === 0) {
-            return res.status(404).send({ message: `No job found with Order ID: ${orderId}`, success: false });
+            return res.status(404).send({ message: `No job found with Order ID: ${orderId} to update.`, success: false });
         }
 
         console.log(`Job with Order ID ${orderId} updated successfully.`);
@@ -213,9 +203,38 @@ app.post("/schedule/update", async (req, res) => {
         res.status(500).send({ message: 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล: ' + err.message, success: false });
     }
 });
-// ********** ส่วนโค้ดเดิมของคุณ (GET/POST/PUT/DELETE) ถูกละไว้เพื่อความกระชับ **********
+
+// -------------------------------------------------------------------
+// 5. DELETE: Delete existing job (/schedule/delete)
+// -------------------------------------------------------------------
+app.post("/schedule/delete", async (req, res) => {
+    // Get OrderId from the request body
+    const { orderId } = req.body;
+    console.log("Received job deletion request for Order ID:", orderId);
+
+    if (!orderId) {
+        return res.status(400).send({ message: 'Order ID is required for deletion.', success: false });
+    }
+
+    try {
+        const result = await pool.request() // Use Connection Pool
+            .input('orderId', sql.NVarChar, orderId)
+            .query(`DELETE FROM [Schedule] WHERE OrderId = @orderId`);
+        
+        if (result.rowsAffected[0] === 0) {
+            return res.status(404).send({ message: `ไม่พบงาน Order ID: ${orderId} ที่ต้องการลบ`, success: false });
+        }
+
+        console.log(`Job with Order ID ${orderId} deleted successfully.`);
+        res.status(200).send({ message: `ลบงาน Order ID: ${orderId} สำเร็จ`, success: true, jobId: orderId });
+
+    } catch (err) {
+        console.error('Database deletion error:', err);
+        res.status(500).send({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล: ' + err.message, success: false });
+    }
+});
 
 
 app.listen(port, () =>
-    console.log("Listen on port : ?", port)
+    console.log("Listen on port : ?", port)
 )

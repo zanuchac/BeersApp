@@ -55,14 +55,21 @@ const showStatusModal = (title, message, isSuccess = true, onConfirm = null) => 
     const modalContent = document.createElement('div');
     modalContent.className = 'modal-content';
     // ปรับสี Modal ตามสถานะ (สำเร็จ/ผิดพลาด)
-    modalContent.style.backgroundColor = isSuccess ? '#e6ffe6' : '#ffe6e6';
-    modalContent.style.border = isSuccess ? '1px solid #00a000' : '1px solid #a00000';
+    // สำหรับการยืนยันลบ ให้ใช้สีแดง (isSuccess = false)
+    const bgColor = isSuccess ? '#e6ffe6' : '#ffe6e6';
+    const borderColor = isSuccess ? '#00a000' : '#a00000';
+    const titleColor = isSuccess ? '#007000' : '#700000';
+    const buttonBgColor = isSuccess ? '#4CAF50' : '#f44336';
+
+
+    modalContent.style.backgroundColor = bgColor;
+    modalContent.style.border = `1px solid ${borderColor}`;
 
     modalContent.innerHTML = `
         <span class="close-btn">&times;</span>
-        <h3 style="color: ${isSuccess ? '#007000' : '#700000'};">${title}</h3>
+        <h3 style="color: ${titleColor};">${title}</h3>
         <p>${message}</p>
-        <button id="modal-ok-btn" class="nav-btn" style="background-color: ${isSuccess ? '#4CAF50' : '#f44336'}; color: white; margin-top: 15px;">OK</button>
+        <button id="modal-ok-btn" class="nav-btn" style="background-color: ${buttonBgColor}; color: white; margin-top: 15px;">OK</button>
     `;
 
     modal.appendChild(modalContent);
@@ -96,7 +103,7 @@ const showStatusModal = (title, message, isSuccess = true, onConfirm = null) => 
 const renderUpcomingJobs = (filterValue = 'all') => {
     
     
-    upcomingJobsList.innerHTML = '';  
+    upcomingJobsList.innerHTML = ''; 
     
 
     // 1. กรองงานที่ยังไม่เสร็จ (ไม่รวมสถานะ 'completed') และที่กำลังจะมา
@@ -114,8 +121,9 @@ const renderUpcomingJobs = (filterValue = 'all') => {
     upcomingJobs.sort((a, b) => {
         if (a.date !== b.date) {
             return a.date.localeCompare(b.date);
-                            
-                            
+            
+            
+            
         }
         return a.time.localeCompare(b.time);
     });
@@ -182,7 +190,7 @@ const renderSchedule = (startDate, filterValue = 'all') => {
     // 2. สร้างแถวของแต่ละช่วงเวลา
     timeSlots.forEach(time => {
         const row = scheduleBody.insertRow();
-                    
+            
         
         // คอลัมน์แรกคือช่วงเวลา
         const timeCell = row.insertCell();
@@ -210,9 +218,9 @@ const renderSchedule = (startDate, filterValue = 'all') => {
                 jobDiv.className = `job-card ${statusClass} job-team-${job.team}`;
                 jobDiv.innerHTML = `
                     <strong>${job.customer} - ${job.jobType}</strong>
-                    ${job.customer} (${job.team ? job.team.toUpperCase() : 'N/A'})
+                    ${job.address} (${job.team ? job.team.toUpperCase() : 'N/A'})
                 `;
-                jobDiv.title = `คลิกเพื่อดูรายละเอียดงาน #${job.id}`;
+                jobDiv.title = `คลิกเพื่อดูรายละเอียดงาน #${job.customer}`;
                 dayCell.appendChild(jobDiv);
                 
                 // *** NEW: เพิ่ม Event Listener สำหรับโหมดแก้ไขงาน ***
@@ -235,15 +243,19 @@ const renderSchedule = (startDate, filterValue = 'all') => {
     
     
     
+    
+    
     // เรียกใช้ฟังก์ชันแสดงงานที่กำลังจะมาถึง
     renderUpcomingJobs(filterValue); 
 };
-                        
-                        
-                        
-                            
-                                
-                    
+            
+            
+            
+            
+            
+            
+            
+            
 
 // -------------------------------------------------------------------
 // X. ฟังก์ชันดึงข้อมูลใหม่จาก Server และ Refresh UI - (ใช้ renderSchedule ได้แล้ว)
@@ -257,8 +269,8 @@ const reloadDataAndRefreshView = async (currentMonday, teamFilterValue) => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-                        
-            
+        
+        
         
         const data = await response.json();
         
@@ -371,6 +383,17 @@ const openJobModal = async (mode = 'add', jobData = {}) => {
                     form.elements['jobType'].value = jobData.jobType || 'ติดตั้ง';
                     form.elements['status'].value = jobData.status || 'scheduled';
 
+                    // --- NEW: เพิ่มปุ่มลบงานและ Listener สำหรับโหมดแก้ไข ---
+                    const deleteBtnHtml = `<button type="button" id="delete-job-btn" class="remove-btn" style="background-color: #dc3545; margin-left: 10px;">ลบงานนี้</button>`;
+                    submitBtn.insertAdjacentHTML('afterend', deleteBtnHtml);
+
+                    const deleteBtn = modalContent.querySelector('#delete-job-btn');
+                    deleteBtn.addEventListener('click', () => {
+                        // ส่ง ID งานจริงไปยืนยันและลบ
+                        confirmAndDeleteJob(jobData.id);
+                    });
+                    // ----------------------------------------------------
+
                 } else {
                     // 'add' mode
                     formTitle.textContent = 'เพิ่มงานติดตั้งใหม่';
@@ -397,13 +420,22 @@ const openJobModal = async (mode = 'add', jobData = {}) => {
 
 // -------------------------------------------------------------------
 // E. ฟังก์ชันจัดการ Submit ฟอร์มงานใหม่/แก้ไข (Job Submission)
+// *FIXED: เปลี่ยนจากการใช้ form.onsubmit เป็น custom property เพื่อป้องกัน listener stacking*
 // -------------------------------------------------------------------
 const handleFormSubmission = (form) => {
-    form.addEventListener('submit', async (e) => {
+    // 1. ลองลบ Listener เก่าออกก่อน โดยใช้ reference ที่เก็บไว้ใน custom property
+    const oldListener = form._submitListener;
+    if (oldListener) {
+        // ลบ Listener เก่าด้วย reference เดิม
+        form.removeEventListener('submit', oldListener); 
+    }
+    
+    // สร้าง Listener ใหม่
+    const newListener = async (e) => {
         e.preventDefault();
         
         const formData = new FormData(form);
-																							   
+                                     
         const data = Object.fromEntries(formData.entries());
         
         // ตรวจสอบว่ามี jobId ไหม ถ้ามี คือโหมดแก้ไข (Update)
@@ -438,11 +470,11 @@ const handleFormSubmission = (form) => {
             
             // ปิด Modal ฟอร์ม
             if (currentModal) {
-                 currentModal.remove();
-                 currentModal = null;
+                currentModal.remove();
+                currentModal = null;
             }
 
-			
+            
 
             if (result.success) {
                 // แสดง Modal สำเร็จ
@@ -451,7 +483,7 @@ const handleFormSubmission = (form) => {
                     successMsg, 
                     true, 
                     // Callback เมื่อกด OK: ดึงข้อมูลใหม่และ Refresh UI
-																													 
+                                 
                     () => reloadDataAndRefreshView(currentMonday, teamFilter.value)
                 );
             } else {
@@ -467,150 +499,210 @@ const handleFormSubmission = (form) => {
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
         }
-    });
+    };
+
+    // 2. แนบ Listener ใหม่
+    form.addEventListener('submit', newListener);
+    // 3. เก็บ reference ของ Listener ใหม่ไว้ใน custom property
+    form._submitListener = newListener; 
+};
+
+
+// -------------------------------------------------------------------
+// F. ฟังก์ชันจัดการการลบงาน (Job Deletion)
+// -------------------------------------------------------------------
+const confirmAndDeleteJob = (orderId) => {
+    // ปิด Modal ฟอร์มงานที่กำลังเปิดอยู่ก่อน
+    if (currentModal) {
+        currentModal.remove();
+        currentModal = null;
+    }
+
+    showStatusModal(
+        'ยืนยันการลบ',
+        `คุณแน่ใจหรือไม่ว่าต้องการลบงานติดตั้ง #${orderId} นี้? การดำเนินการนี้ไม่สามารถยกเลิกได้`,
+        false, // ใช้สี/ไอคอนเตือนภัย (สีแดง)
+        async () => {
+            // Callback เมื่อผู้ใช้กด OK ใน Modal ยืนยัน
+            try {
+                const response = await fetch('/schedule/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: orderId })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // ลบสำเร็จ
+                    showStatusModal(
+                        'ลบงานสำเร็จ',
+                        `งานติดตั้ง #${orderId} ถูกลบออกจากระบบแล้ว`,
+                        true,
+                        () => reloadDataAndRefreshView(currentMonday, teamFilter.value)
+                    );
+                } else {
+                    // Server ตอบกลับมาว่าไม่สำเร็จ
+                    throw new Error(result.message || 'Server returned failure.');
+                }
+            } catch (error) {
+                console.error("Error deleting job:", error);
+                showStatusModal(
+                    'เกิดข้อผิดพลาดในการลบ',
+                    `ไม่สามารถลบงาน #${orderId} ได้: ${error.message}`,
+                    false
+                );
+            }
+        }
+    );
 };
 
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Global Data and DOM Elements
+    // NOTE: liveJobs is assumed to be defined by EJS before this script runs.
     jobsData = Array.isArray(liveJobs) ? liveJobs : [];
     console.log("Loaded Jobs from Database:", jobsData);
 
-				  
+        
     scheduleBody = document.getElementById('schedule-body');
     upcomingJobsList = document.getElementById('upcoming-jobs-list');
     teamFilter = document.getElementById('team-filter'); // กำหนดค่าให้ตัวแปร Global teamFilter
     const addBtn = document.querySelector('.add-btn'); 
     
     // 2. Calculate initial currentMonday 
-						  
-										   
- 
-													
+                                
+                                    
+											
+    
     currentMonday = new Date(); 
-						 
+                                
     currentMonday.setDate(currentMonday.getDate() - (currentMonday.getDay() + 6) % 7);
 
     // 3. Setup Event Listeners
     
-							  
-				  
-
-					
-							   
-					
-			   
-		   
-
-											 
-							 
-
-						  
-		 
-					
-   
-
-					   
-		  
-		 
-			 
 	
-			
-	 
-  
-								   
-			
-
-
-		  
-											  
-	   
    
 
-			  
-		  
-				
-				
-   
-				   
-		 
-				
-								 
-								   
-	 
-			  
-	 
-   
-
-					
-							  
-					
-				
-		  
   
-						  
-			  
-			
-			   
-	  
-	 
-
-					 
-						   
-							  
-						 
-  
-							   
-						
-		   
-		   
-			 
-								
 	
-	 
-
-					   
-		   
-			 
+  
    
-					 
-			 
-		  
+  
 
-							  
-			
-			 
-			 
+   
+  
 
-										 
-				
-			  
-		   
-					
-	  
-	
-			 
-				 
-				  
+  
+   
+  
+   
+
+  
+ 
+   
+ 
+ 
+   
+  
+  
 	 
-					   
-		  
-				 
-					   
-	   
-							   
-			
-	   
-	  
+   
+
+
+ 
+	
+ 
+   
+
+  
+ 
+ 
+ 
+   
+	
+   
+ 
+   
 	 
   
-								
-		   
+  
+  
    
 
-					
-					  
-					
+  
+   
+  
+ 
+ 
+  
+  
+  
+   
+   
+   
+  
+
+   
+   
+   
+	
+  
+	
+   
+  
+  
+ 
+  
+ 
+  
+
+  
+  
+ 
+   
+   
+ 
+ 
+
+   
+   
+ 
+ 
+
+	 
+ 
+  
+  
+  
+   
+ 
+ 
+  
+   
+  
+  
+ 
+  
+  
+ 
+	
+   
+ 
+   
+  
+  
+  
+  
+   
+
+  
+	
+  
 
     // ควบคุมการเปลี่ยนสัปดาห์
     document.getElementById('prev-week-btn').addEventListener('click', () => {
@@ -632,38 +724,39 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addBtn) {
         addBtn.addEventListener('click', () => {
             openJobModal('add'); 
-			
-				 
-												  
-				
-								   
-																			  
-				 
-				
-														  
-				
-																														  
-															
-																			 
-																				
-																			
-					
-											
-																																			 
-										   
-																   
-						 
+            
+            
+    
+            
+ 
+	 
+	  
+  
+ 
+	
+ 
+		
+	  
+	 
+	 
+	   
+  
+	 
+		 
+	
+	   
+	
 
-																																																																			 
-															
-					 
-				   
+				 
+	  
+   
+	
 
-							 
-																	
-																					 
-																																																														 
-			 
+  
+	 
+	   
+				  
+ 
         });
     }
 
