@@ -1,77 +1,69 @@
-<% 
-// **NOTE:** ข้อมูลเหล่านี้ควรถูกส่งมาจาก Express Server เมื่อเรียก res.render('input_schedule', data)
-// แต่สำหรับ EJS ไฟล์เดี่ยวนี้ เราจะกำหนดค่าเริ่มต้นไว้
-const teams = [{id: 'team-a', name: 'ทีมช่าง A'}, {id: 'team-b', name: 'ทีมช่าง B'}, {id: 'team-c', name: 'ทีมช่าง C'}];
-const timeSlots = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-const jobTypes = ["ติดตั้งผ้าม่าน", "วัดหน้างาน", "บริการหลังการขาย", "งานซ่อม"];
-%>
+<div class="modal-header">
+    <span class="close-btn cancel-btn">&times;</span>
+    <h3>เพิ่มงานติดตั้งใหม่</h3>
+</div>
 
-<div class="input-form-container">
-    <header class="form-header">
-        <h2>📅 บันทึกงานติดตั้ง/นัดหมายใหม่</h2>
-        <p>กรุณากรอกข้อมูลให้ครบถ้วนเพื่อจัดสรรงานให้กับทีมช่าง</p>
-    </header>
+<form id="new-job-form">
+    <div class="form-group">
+        <label for="customer">ชื่อลูกค้า:</label>
+        <input type="text" id="customerName" name="customerName" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="orderId">รหัสคำสั่งซื้อ (Order ID):</label>
+        <!-- เพิ่ม Order ID: กำหนดเป็น readonly เพื่อให้ JS กำหนดค่าแบบ fix value -->
+        <input type="text" id="orderId" name="orderId" required readonly placeholder="จะถูกสร้างอัตโนมัติ (yyyymmddhhmmss)">
+    </div>
 
-    <form id="new-job-form" action="/schedule/new" method="POST">
-        
-        <div class="form-group half-width">
-            <label for="orderId">รหัสคำสั่งซื้อ:</label>
-            <input type="text" id="orderId" name="orderId" placeholder="เช่น ORD-20251101-005" required>
-        </div>
+    <div class="form-group">
+        <label for="address">ที่อยู่ติดตั้ง:</label>
+        <!-- เพิ่ม Address โดยใช้ textarea -->
+        <textarea id="address" name="address" rows="3" required></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="jobType">ประเภทงาน:</label>
+        <select id="jobType" name="jobType" required>
+            <option value="ติดตั้ง">ติดตั้ง</option>
+            <option value="ซ่อมแซม">ซ่อมแซม</option>
+            <option value="วัดพื้นที่">วัดพื้นที่</option>
+            <option value="อื่นๆ">อื่นๆ</option>
+        </select>
+    </div>
 
-        <div class="form-group half-width">
-            <label for="customerName">ชื่อลูกค้า / โครงการ:</label>
-            <input type="text" id="customerName" name="customerName" required>
-        </div>
-        
-        <div class="form-group full-width">
-            <label for="address">ที่อยู่ติดตั้งโดยละเอียด:</label>
-            <textarea id="address" name="address" rows="3" required></textarea>
-        </div>
-
-        <div class="form-group half-width">
-            <label for="appointmentDate">วันที่นัดหมาย:</label>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="date">วันที่:</label>
             <input type="date" id="appointmentDate" name="appointmentDate" required>
         </div>
-
-        <div class="form-group half-width">
-            <label for="appointmentTime">ช่วงเวลา:</label>
+        
+        <div class="form-group">
+            <label for="time">เวลา:</label>
             <select id="appointmentTime" name="appointmentTime" required>
-                <option value="" disabled selected>-- เลือกเวลา --</option>
-                <% timeSlots.forEach(time => { %>
-                    <option value="<%= time %>"><%= time %></option>
-                <% }); %>
+                <option value="09:00">09:00</option>
+                <option value="10:00">10:00</option>
+                <option value="11:00">11:00</option>
+                <option value="13:00">13:00</option>
+                <option value="14:00">14:00</option>
+                <option value="15:00">15:00</option>
+                <option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
             </select>
         </div>
-        
-        <div class="form-group half-width">
-            <label for="jobType">ประเภทงาน:</label>
-            <select id="jobType" name="jobType" required>
-                <option value="" disabled selected>-- เลือกประเภทงาน --</option>
-                <% jobTypes.forEach(type => { %>
-                    <option value="<%= type %>"><%= type %></option>
-                <% }); %>
-            </select>
-        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="team">ทีมช่าง:</label>
+        <select id="team" name="team" required>
+            <option value="">เลือกทีมช่าง</option>
+            <option value="team-a">ทีมช่าง A</option>
+            <option value="team-b">ทีมช่าง B</option>
+            <!-- เพิ่มทีมอื่นๆ -->
+        </select>
+    </div>
 
-        <div class="form-group half-width">
-            <label for="team">ทีมช่างผู้รับผิดชอบ:</label>
-            <select id="team" name="team" required>
-                <option value="" disabled selected>-- เลือกทีมช่าง --</option>
-                <% teams.forEach(team => { %>
-                    <option value="<%= team.id %>"><%= team.name %></option>
-                <% }); %>
-            </select>
-        </div>
-        
-        <div class="form-group full-width">
-            <label for="notes">หมายเหตุพิเศษ / ข้อมูลทีมช่าง:</label>
-            <textarea id="notes" name="notes" rows="4"></textarea>
-        </div>
-        
-        <div class="form-actions full-width">
-            <button type="submit" class="submit-btn">บันทึกงานลงตาราง</button>
-            <button type="button" class="cancel-btn" onclick="document.getElementById('form-modal').remove()">ยกเลิก</button>
-        </div>
-    </form>
-</div>
+    <div class="form-actions">
+        <button type="button" class="nav-btn cancel-btn">ยกเลิก</button>
+        <button type="submit" class="nav-btn add-btn">บันทึกงาน</button>
+    </div>
+</form>

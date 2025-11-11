@@ -50,7 +50,6 @@ app.get("/", async (req,res) => {
 // 1. ENDPOINT: แสดงหน้าหลักตารางนัดหมาย (/schedule) - แก้ไขให้ดึงข้อมูล
 // -------------------------------------------------------------------
 app.get("/schedule", async (req,res) => { // <--- ต้องมี 'async' เพื่อใช้ 'await' ด้านใน
-        console.log('xxxxxxxxxxxxx Loading Database xxxxxxxxxxx')
     try {
         // *** ใช้ 'await' เพื่อรอผลลัพธ์จากการ Query จากฐานข้อมูล ***
         const result = await pool.request().query( 
@@ -72,6 +71,41 @@ app.get("/schedule", async (req,res) => { // <--- ต้องมี 'async' เ
         res.render('schedule', { 
             jobs: result.recordset || [],
             dbError: null // ส่งค่า null เมื่อไม่มี error
+        });
+
+    } catch (err) {
+        console.error('Database Query Error:', err);
+        // กรณี Query ล้มเหลว ส่งหน้า schedule พร้อม error message ไป
+        res.render('schedule', { 
+            jobs: [], 
+            dbError: 'ไม่สามารถดึงข้อมูลตารางงานได้ กรุณาตรวจสอบการเชื่อมต่อฐานข้อมูล: ' + err.message
+        });
+    }
+});
+
+app.get('/schedule/data', async(req, res) => {
+    try {
+        // *** ใช้ 'await' เพื่อรอผลลัพธ์จากการ Query จากฐานข้อมูล ***
+        const result = await pool.request().query( 
+            `SELECT 
+                orderid as id, 
+                CustomerName as customer, 
+                Team as team, 
+                Status as status, 
+                FORMAT(AppointmentDate, 'yyyy-MM-dd') as date, 
+                AppointmentTime as time, 
+                JobType as jobType 
+            FROM schedule 
+            ORDER BY AppointmentDate, AppointmentTime`
+        );
+        
+        console.log('load data from database completed')
+
+        // ในการใช้งานจริง: ดึงข้อมูลทั้งหมดจาก DB
+        // ใน Mock: ส่งข้อมูลจำลองทั้งหมดในรูปแบบ JSON
+        res.json({ 
+            success: true,
+            jobs: result.recordset || [] 
         });
 
     } catch (err) {
@@ -114,16 +148,14 @@ app.post("/schedule/new", (req, res) => {
             .input('status', sql.NVarChar, "initial")
             // เพิ่ม input อื่นๆ ตามที่ต้องการ
             .query('INSERT INTO [Schedule] (OrderId, CustomerName, Address, AppointmentDate, AppointmentTime, JobType, Team, Status) VALUES (@orderId, @customerName, @address, @appointmentDate, @appointmentTime, @jobType, @team, @status)');
-        console.log(sql.query)
     }).then(result => {
         console.log('Job saved successfully.');
-        res.status(201).send({ message: 'บันทึกงานใหม่สำเร็จ' });
+        res.status(201).send({ message: 'บันทึกงานใหม่สำเร็จ', success: true });
     }).catch(err => {
         console.error('Database insertion error:', err);
         res.status(500).send({ message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' });
     });
 
-    res.render('schedule')
     // ตอบกลับทันทีเพื่อยืนยันการรับข้อมูล (สำหรับ Demo)
     //res.status(200).send({ message: `Received job for ${newJobData.customerName} on ${newJobData.appointmentDate}` });
 })
