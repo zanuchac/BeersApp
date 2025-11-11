@@ -1,69 +1,86 @@
-<div class="modal-header">
-    <span class="close-btn cancel-btn">&times;</span>
-    <h3>เพิ่มงานติดตั้งใหม่</h3>
-</div>
-
+<div class="form-container">
+<h3 class="form-title">เพิ่มงานติดตั้งใหม่</h3>
 <form id="new-job-form">
+<!-- Hidden field for Job ID (ใช้สำหรับส่ง Order ID กลับไปในโหมดแก้ไข) -->
+<input type="hidden" name="jobId" value="">
+
     <div class="form-group">
-        <label for="customer">ชื่อลูกค้า:</label>
-        <input type="text" id="customerName" name="customerName" required>
+        <label for="orderId">Order ID / รหัสงาน:</label>
+        <!-- ชื่อฟิลด์: orderId -->
+        <input type="text" id="orderId" name="orderId" required>
     </div>
-    
+
     <div class="form-group">
-        <label for="orderId">รหัสคำสั่งซื้อ (Order ID):</label>
-        <!-- เพิ่ม Order ID: กำหนดเป็น readonly เพื่อให้ JS กำหนดค่าแบบ fix value -->
-        <input type="text" id="orderId" name="orderId" required readonly placeholder="จะถูกสร้างอัตโนมัติ (yyyymmddhhmmss)">
+        <label for="customerName">ชื่อลูกค้า:</label>
+        <!-- ชื่อฟิลด์: customerName -->
+        <input type="text" id="customerName" name="customerName" required>
     </div>
 
     <div class="form-group">
         <label for="address">ที่อยู่ติดตั้ง:</label>
-        <!-- เพิ่ม Address โดยใช้ textarea -->
+        <!-- ชื่อฟิลด์: address -->
         <textarea id="address" name="address" rows="3" required></textarea>
     </div>
-    
-    <div class="form-group">
-        <label for="jobType">ประเภทงาน:</label>
-        <select id="jobType" name="jobType" required>
-            <option value="ติดตั้ง">ติดตั้ง</option>
-            <option value="ซ่อมแซม">ซ่อมแซม</option>
-            <option value="วัดพื้นที่">วัดพื้นที่</option>
-            <option value="อื่นๆ">อื่นๆ</option>
-        </select>
-    </div>
 
-    <div class="form-row">
+    <div class="form-group-row">
         <div class="form-group">
-            <label for="date">วันที่:</label>
+            <label for="appointmentDate">วันที่นัดหมาย:</label>
+            <!-- ชื่อฟิลด์: appointmentDate -->
             <input type="date" id="appointmentDate" name="appointmentDate" required>
         </div>
-        
         <div class="form-group">
-            <label for="time">เวลา:</label>
+            <label for="appointmentTime">เวลานัดหมาย:</label>
+            <!-- ชื่อฟิลด์: appointmentTime -->
             <select id="appointmentTime" name="appointmentTime" required>
-                <option value="09:00">09:00</option>
-                <option value="10:00">10:00</option>
-                <option value="11:00">11:00</option>
-                <option value="13:00">13:00</option>
-                <option value="14:00">14:00</option>
-                <option value="15:00">15:00</option>
-                <option value="16:00">16:00</option>
-                <option value="17:00">17:00</option>
+                <option value="09:00">09:00 น.</option>
+                <option value="10:00">10:00 น.</option>
+                <option value="11:00">11:00 น.</option>
+                <option value="13:00">13:00 น.</option>
+                <option value="14:00">14:00 น.</option>
+                <option value="15:00">15:00 น.</option>
+                <option value="16:00">16:00 น.</option>
+                <option value="17:00">17:00 น.</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group-row">
+        <div class="form-group">
+            <label for="jobType">ประเภทงาน:</label>
+            <!-- ชื่อฟิลด์: jobType -->
+            <select id="jobType" name="jobType">
+                <option value="ติดตั้ง">ติดตั้ง</option>
+                <option value="ซ่อมแซม">ซ่อมแซม</option>
+                <option value="วัดพื้นที่">วัดพื้นที่</option>
+                <option value="ตรวจเช็ค">ตรวจเช็ค</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="team">ทีมช่าง:</label>
+            <!-- ชื่อฟิลด์: team -->
+            <select id="team" name="team" required>
+                <option value="team-a">Team A</option>
+                <option value="team-b">Team B</option>
             </select>
         </div>
     </div>
     
     <div class="form-group">
-        <label for="team">ทีมช่าง:</label>
-        <select id="team" name="team" required>
-            <option value="">เลือกทีมช่าง</option>
-            <option value="team-a">ทีมช่าง A</option>
-            <option value="team-b">ทีมช่าง B</option>
-            <!-- เพิ่มทีมอื่นๆ -->
+        <label for="status">สถานะงาน:</label>
+        <!-- ชื่อฟิลด์: status -->
+        <select id="status" name="status">
+            <option value="scheduled">Scheduled</option>
+            <option value="inprogress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
         </select>
     </div>
 
     <div class="form-actions">
-        <button type="button" class="nav-btn cancel-btn">ยกเลิก</button>
-        <button type="submit" class="nav-btn add-btn">บันทึกงาน</button>
+        <button type="submit" class="submit-btn">บันทึกงานใหม่</button>
+        <button type="button" class="cancel-btn">ยกเลิก</button>
     </div>
 </form>
+
+
+</div>
