@@ -12,6 +12,9 @@
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "mssql": "^12.1.0"
+    "express-session": "^1.18.2",
+    "mssql": "^12.1.0",
+    "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0"
   }
 }

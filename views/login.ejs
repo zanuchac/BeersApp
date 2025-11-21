@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ | Schedule App</title>
+    <!-- ใช้ Tailwind CSS CDN สำหรับการจัดสไตล์ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .facebook-blue {
+            background-color: #1877f2;
+        }
+        .facebook-blue:hover {
+            background-color: #166fe5;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 space-y-6">
+        <h2 class="text-3xl font-extrabold text-gray-900 text-center">
+            เข้าสู่ระบบเพื่อเข้าถึงตารางงาน
+        </h2>
+        <p class="text-center text-gray-500">กรุณาเข้าสู่ระบบด้วยบัญชี Facebook ของคุณ</p>
+
+        <!-- ปุ่ม Login ด้วย Facebook -->
+        <a href="/auth/facebook" 
+           class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg 
+                  shadow-sm text-lg font-medium text-white facebook-blue 
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+            <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <!-- Facebook Icon SVG -->
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 5.099 3.71 9.349 8.563 10.363V15.42H5.976V12h2.587V9.337c0-2.56 1.559-3.961 3.844-3.961 1.094 0 2.035.195 2.308.28v2.667h-1.58c-1.24 0-1.48.59-1.48 1.458V12h3.04l-.497 3.42h-2.543v6.943C20.29 21.35 24 17.099 24 12C24 5.373 18.627 0 12 0z"/>
+            </svg>
+            <span>เข้าสู่ระบบด้วย Facebook</span>
+        </a>
+    </div>
+</body>
+</html>

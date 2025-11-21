@@ -1,11 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>หน้าหลัก | Schedule App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <p>Index</p>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <header class="flex justify-between items-center pb-4 border-b border-gray-200">
+            <h1 class="text-4xl font-bold text-gray-800">ยินดีต้อนรับสู่ Schedule App</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-lg font-medium text-gray-600">
+                    สวัสดี, <%= user.DisplayName %>
+                </span>
+                <a href="/logout" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-150">
+                    ออกจากระบบ
+                </a>
+            </div>
+        </header>
+
+        <main class="mt-6 space-y-6">
+            <p class="text-gray-700">
+                คุณได้เข้าสู่ระบบเรียบร้อยแล้วด้วยบัญชี Facebook และพร้อมที่จะจัดการตารางงาน
+            </p>
+            <div class="flex space-x-4">
+                <a href="/schedule" class="px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-150">
+                    ดูตารางงาน
+                </a>
+                <a href="/schedule/input" class="px-6 py-3 bg-green-600 text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-150">
+                    เพิ่มงานใหม่
+                </a>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

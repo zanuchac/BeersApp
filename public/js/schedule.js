@@ -40,6 +40,21 @@ const generateOrderId = () => {
 };
 
 // -------------------------------------------------------------------
+// HELPER: ฟังก์ชันคำนวณวันที่ทั้ง 7 วันในสัปดาห์ (เริ่มต้นจาก startDate)
+// -------------------------------------------------------------------
+const getWeekDates = (startDate) => {
+    // ใช้วิธี map และสร้าง Date object ใหม่ทุกครั้งเพื่อป้องกันการ mutate ค่า
+    return daysOfWeek.map((_, index) => {
+        const date = new Date(startDate); 
+        // ในการทำงานของ JS, date.setDate(value) จะถูกคำนวณจากวันที่ปัจจุบันของ date
+        // ซึ่ง date ถูกสร้างมาจาก startDate จึงเป็นวันจันทร์เสมอ
+        date.setDate(startDate.getDate() + index); 
+        return date;
+    });
+};
+
+
+// -------------------------------------------------------------------
 // Z. ฟังก์ชันแสดง Modal แจ้งเตือนความสำเร็จหรือล้มเหลว (แทน alert())
 // -------------------------------------------------------------------
 const showStatusModal = (title, message, isSuccess = true, onConfirm = null) => {
@@ -55,7 +70,7 @@ const showStatusModal = (title, message, isSuccess = true, onConfirm = null) => 
     const modalContent = document.createElement('div');
     modalContent.className = 'modal-content';
     // ปรับสี Modal ตามสถานะ (สำเร็จ/ผิดพลาด)
-    // สำหรับการยืนยันลบ ให้ใช้สีแดง (isSuccess = false)
+																												
     const bgColor = isSuccess ? '#e6ffe6' : '#ffe6e6';
     const borderColor = isSuccess ? '#00a000' : '#a00000';
     const titleColor = isSuccess ? '#007000' : '#700000';
@@ -151,7 +166,7 @@ const renderUpcomingJobs = (filterValue = 'all') => {
         `;
         upcomingJobsList.appendChild(jobItem);
 
-        // *** NEW: เพิ่ม Listener สำหรับเปิด Modal ในโหมดแก้ไขจาก Sidebar ***
+        // เพิ่ม Listener สำหรับเปิด Modal ในโหมดแก้ไขจาก Sidebar
         jobItem.addEventListener('click', () => {
             openJobModal('edit', job);
         });
@@ -164,12 +179,12 @@ const renderUpcomingJobs = (filterValue = 'all') => {
 const renderSchedule = (startDate, filterValue = 'all') => {
     scheduleBody.innerHTML = ''; 
     
-    // คำนวณวันที่ของแต่ละวันในสัปดาห์
-    const weekDates = daysOfWeek.map((_, index) => {
-        const date = new Date(startDate);
-        date.setDate(startDate.getDate() + index);
-        return date;
-    });
+    // คำนวณวันที่ของแต่ละวันในสัปดาห์โดยใช้ Helper Function
+    const weekDates = getWeekDates(startDate);
+										 
+												  
+					
+	   
         
     
     
@@ -223,7 +238,7 @@ const renderSchedule = (startDate, filterValue = 'all') => {
                 jobDiv.title = `คลิกเพื่อดูรายละเอียดงาน #${job.customer}`;
                 dayCell.appendChild(jobDiv);
                 
-                // *** NEW: เพิ่ม Event Listener สำหรับโหมดแก้ไขงาน ***
+                // เพิ่ม Event Listener สำหรับโหมดแก้ไขงาน
                 jobDiv.addEventListener('click', () => {
                     openJobModal('edit', job);
                 });
@@ -435,7 +450,7 @@ const handleFormSubmission = (form) => {
         e.preventDefault();
         
         const formData = new FormData(form);
-                                     
+                                            
         const data = Object.fromEntries(formData.entries());
         
         // ตรวจสอบว่ามี jobId ไหม ถ้ามี คือโหมดแก้ไข (Update)
@@ -483,7 +498,7 @@ const handleFormSubmission = (form) => {
                     successMsg, 
                     true, 
                     // Callback เมื่อกด OK: ดึงข้อมูลใหม่และ Refresh UI
-                                 
+                                            
                     () => reloadDataAndRefreshView(currentMonday, teamFilter.value)
                 );
             } else {
@@ -575,122 +590,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = document.querySelector('.add-btn'); 
     
     // 2. Calculate initial currentMonday 
-                                
-                                    
-											
+                                        
+                                        
+                                            
     
     currentMonday = new Date(); 
-                                
+                                        
+    // หาจุดเริ่มต้นของสัปดาห์ (วันจันทร์)
+    // getDay() คือ 0=อาทิตย์, 1=จันทร์, ...
+    // การคำนวณนี้จะตั้งค่าเป็นวันจันทร์ของสัปดาห์ปัจจุบันเสมอ
     currentMonday.setDate(currentMonday.getDate() - (currentMonday.getDay() + 6) % 7);
 
     // 3. Setup Event Listeners
     
-	
-   
-
-  
-	
-  
-   
-  
-
-   
-  
-
-  
-   
-  
-   
-
-  
- 
-   
- 
- 
-   
-  
-  
-	 
-   
-
-
- 
-	
+    
  
    
 
   
  
+  
+   
+  
+
+   
+  
+
+  
+   
+  
+   
+
+  
+ 
+   
  
  
    
-	
-   
- 
-   
-	 
   
   
   
    
 
-  
-   
-  
- 
- 
-  
-  
-  
-   
-   
-   
-  
 
-   
-   
-   
-	
-  
-	
-   
-  
-  
  
-  
  
-  
+ 
+   
 
   
-  
+ 
+ 
  
    
-   
  
- 
-
-   
-   
- 
- 
-
-	 
- 
-  
-  
-  
-   
- 
- 
-  
-   
-  
-  
- 
-  
-  
- 
-	
    
  
    
@@ -701,7 +654,73 @@ document.addEventListener('DOMContentLoaded', () => {
    
 
   
-	
+   
+  
+ 
+ 
+  
+  
+  
+   
+   
+   
+  
+
+   
+   
+   
+ 
+  
+ 
+   
+  
+  
+ 
+  
+ 
+  
+
+  
+  
+ 
+   
+   
+ 
+ 
+
+   
+   
+ 
+ 
+
+  
+ 
+  
+  
+  
+   
+ 
+ 
+  
+   
+  
+  
+ 
+  
+  
+ 
+ 
+   
+ 
+   
+  
+  
+  
+  
+   
+
+  
+ 
   
 
     // ควบคุมการเปลี่ยนสัปดาห์
@@ -726,36 +745,42 @@ document.addEventListener('DOMContentLoaded', () => {
             openJobModal('add'); 
             
             
+            
+    
+            
+            
+    
+            
     
             
  
-	 
-	  
   
- 
-	
- 
-		
-	  
-	 
-	 
-	   
-  
-	 
-		 
-	
-	   
-	
-
-				 
-	  
    
+  
+ 
+ 
+ 
+  
+   
+  
+  
 	
+  
+  
+   
+ 
+	
+ 
+
+	 
+   
+   
+ 
 
   
-	 
-	   
-				  
+  
+	
+	  
  
         });
     }

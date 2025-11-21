@@ -7,6 +7,33 @@
     <!-- ลิงก์ไปยังไฟล์ CSS ที่รวบรวมไว้ -->
     <!-- แก้ไขลิงก์ CSS ตามที่คุณต้องการ -->
     <link rel="stylesheet" href="/css/stylesheet.css"> 
+    
+    <!-- เพิ่มสไตล์เบื้องต้นสำหรับ User Info ในกรณีที่ CSS ภายนอกไม่มี -->
+    <style>
+        .user-status {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .user-status p {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .logout-btn {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e57373;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
 <body>
 
@@ -15,6 +42,15 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo">Curtain Schedule</div>
+
+            <!-- เพิ่มส่วนแสดงข้อมูลผู้ใช้และปุ่ม Logout -->
+            <div class="user-status">
+                <p>ผู้ใช้งาน:</p>
+                <p><%= user.DisplayName %></p>
+                <a href="/logout" class="logout-btn">ออกจากระบบ</a>
+            </div>
+            <!-- สิ้นสุดส่วนแสดงข้อมูลผู้ใช้ -->
+
             <nav>
                 <a href="/schedule" class="nav-item active">ตารางติดตั้ง</a>
                 <a href="#" class="nav-item">รายงาน</a>
@@ -35,6 +71,7 @@
                     <button id="prev-week-btn" class="nav-btn">ก่อนหน้า</button>
                     <span id="current-week-range"></span>
                     <button id="next-week-btn" class="nav-btn">ถัดไป</button>
+                    <!-- เปลี่ยน button เป็น link เพื่อไปหน้าเพิ่มงาน -->																	 
                     <button class="add-btn">+ เพิ่มงานใหม่</button>
                 </div>
             </div>
@@ -61,6 +98,16 @@
                     </thead>
                     <tbody id="schedule-body">
                         <!-- ตารางจะถูกสร้างโดย JavaScript -->
+                        <% if (jobs && jobs.length > 0) { %>
+                            <% jobs.forEach(job => { %>
+                                <!-- ตัวอย่างข้อมูลที่ถูก Render จาก EJS -->
+                                <tr>
+                                    <td><%= job.time %></td>
+                                    <!-- ตรงนี้ควรถูกแทนที่ด้วย logic การแสดงผลตามวันใน JS/EJS ที่ซับซ้อนกว่านี้ -->
+                                    <td colspan="7">งาน: <%= job.customer %> | ทีม: <%= job.team %> | วันที่: <%= job.date %></td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
@@ -71,15 +118,33 @@
             <h3>งานที่กำลังจะมาถึง</h3>
             <div id="upcoming-jobs-list" class="job-list">
                 <!-- รายการงานจะถูกสร้างโดย JavaScript -->
+                <% if (jobs && jobs.length > 0) { %>
+                    <% jobs.slice(0, 3).forEach(job => { %>
+                        <!-- ตัวอย่างแสดงรายการงานที่กำลังจะมาถึง -->
+                        <div class="job-item">
+                            <p><strong><%= job.customer %></strong></p>
+                            <p><%= job.date %> @ <%= job.time %> (ทีม <%= job.team %>)</p>
+                        </div>
+                    <% }) %>
+                <% } %>
             </div>
         </div>
 
     </div>
 
-    <!-- 1. ต้องกำหนดตัวแปร liveJobs ก่อนไฟล์ schedule_page.js จะถูกโหลด -->
+    <!-- 1. ต้องกำหนดตัวแปร liveJobs และ currentUser ก่อนไฟล์ schedule.js จะถูกโหลด -->
     <script>
-        const liveJobs = <%- JSON.stringify(jobs) %>;
-        console.log(liveJobs);
+        // ข้อมูลผู้ใช้ที่ล็อกอินอยู่
+        const currentUser = {
+            id: '<%= user.UserId %>',
+            displayName: '<%= user.DisplayName %>'
+        };
+        
+        // ข้อมูลตารางงาน
+        const liveJobs = <%- JSON.stringify(jobs || []) %>;
+        
+        console.log('Current User:', currentUser.displayName);
+        console.log('Live Jobs Data Loaded:', liveJobs.length, 'jobs');
     </script>
     
 

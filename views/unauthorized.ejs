@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ไม่ได้รับสิทธิ์การใช้งาน</title>
+<!-- สามารถใช้ Tailwind CSS หรือ CSS ธรรมดาเพื่อความสวยงาม -->
+<style>
+body {
+font-family: Arial, sans-serif;
+background-color: #f7f7f7;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+margin: 0;
+text-align: center;
+}
+.container {
+background-color: #fff;
+padding: 40px;
+border-radius: 12px;
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+max-width: 500px;
+width: 90%;
+border-left: 8px solid #dc3545; /* สีแดงสำหรับแจ้งเตือน */
+}
+h1 {
+color: #dc3545;
+font-size: 24px;
+margin-bottom: 20px;
+}
+p {
+color: #555;
+font-size: 16px;
+line-height: 1.6;
+margin-bottom: 25px;
+}
+.contact-info {
+background-color: #f8d7da;
+color: #721c24;
+padding: 15px;
+border-radius: 8px;
+margin-top: 20px;
+}
+.user-id {
+font-family: monospace;
+font-size: 14px;
+color: #007bff;
+display: block;
+margin-top: 10px;
+word-break: break-all;
+}
+.logout-btn {
+background-color: #6c757d;
+color: white;
+padding: 10px 20px;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+text-decoration: none;
+display: inline-block;
+margin-top: 20px;
+transition: background-color 0.3s;
+}
+.logout-btn:hover {
+background-color: #5a6268;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>❌ ไม่ได้รับสิทธิ์การใช้งาน</h1>
+<p>
+คุณได้ทำการลงชื่อเข้าใช้ผ่าน Facebook สำเร็จแล้ว แต่บัญชีของคุณยังไม่ได้รับการอนุมัติให้เข้าใช้งานแอปพลิเคชันนี้
+</p>
+<div class="contact-info">
+<strong>กรุณาติดต่อ Web Admin</strong> เพื่อดำเนินการเพิ่มสิทธิ์การใช้งาน
+
+
+
+
+
+<small>โปรดแจ้ง User ID ของคุณให้ Admin ทราบ:</small>
+<% if (userId) { %>
+<span class="user-id"><%= userId %></span>
+<% } else { %>
+<span class="user-id">ไม่พบ User ID</span>
+<% } %>
+</div>
+<a href="/logout" class="logout-btn">ออกจากระบบ</a>
+</div>
+</body>
+</html>
