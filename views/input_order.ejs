@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการ Order และ ใบเสนอราคา</title>
+    <style>
+        /* Base Styling */
+        body { font-family: 'Tahoma', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        h1 { color: #007bff; text-align: center; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        .form-control, .form-select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #007bff; outline: none; box-shadow: 0 0 5px rgba(0, 123, 255, 0.2); }
+        .read-only { background-color: #e9ecef !important; font-weight: bold; }
+
+        /* Button Styling */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .btn-add { background-color: #007bff; color: white; }
+        .btn-add:hover { background-color: #0056b3; transform: translateY(-1px); }
+        .btn-save { background-color: #28a745; color: white; }
+        .btn-save:hover { background-color: #218833; transform: translateY(-1px); }
+        .btn-save:disabled { background-color: #90ee90; cursor: not-allowed; }
+        .btn-reset { background-color: #dc3545; color: white; }
+        .btn-reset:hover { background-color: #c82333; transform: translateY(-1px); }
+
+        /* Status & Layout */
+        .status-message { padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .hidden-fields { padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-top: 15px; background-color: #fcfcfc; }
+        .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .three-cols-size { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 5px; }
+        .form-group-compact { margin-bottom: 0; }
+        .form-group-compact label { font-size: 0.9em; font-weight: normal; margin-bottom: 4px; }
+        .summary-box { background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .summary-box h3 { margin-top: 0; margin-bottom: 10px; font-size: 1.2em; }
+        .item-list { list-style: none; padding: 0; margin-bottom: 10px; }
+        .item-list li { 
+            background: #fcf8e3; 
+            padding: 8px; 
+            border-bottom: 1px dashed #e9d0a1; 
+            font-size: 0.95em; 
+            display: flex;
+            justify-content: space-between;
+        }
+        .item-list li:last-child { border-bottom: none; }
+        .item-list .details { flex-grow: 1; }
+        .item-list .price-info { font-weight: bold; color: #cc8100; flex-shrink: 0; }
+        .running-total { text-align: right; font-weight: bold; border-top: 1px solid #ffeeba; padding-top: 8px; margin-bottom: 0; }
+
+        /* Quotation Specific Styling (Formal & Professional) */
+        .quotation-container {
+            padding: 30px;
+            border: 1px solid #ccc;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: none; /* Initially hidden */
+        }
+        .quotation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #007bff;
+        }
+        .quotation-header h2 { margin: 0; color: #007bff; font-size: 2.2em; font-weight: 700; }
+        .company-info { text-align: right; font-size: 0.9em; }
+        .customer-block { margin-bottom: 30px; padding: 15px; border: 1px solid #eee; border-left: 5px solid #007bff; }
+        .customer-block p { margin: 5px 0; }
+        .quotation-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .quotation-table th, .quotation-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        .quotation-table th { background-color: #f8f8f8; font-weight: bold; text-align: center; }
+        .quotation-table .col-desc { text-align: left; }
+        .quotation-table .col-num { text-align: right; }
+        .quotation-table tfoot td { font-weight: bold; background-color: #e6f2ff; }
+        .quotation-table tfoot .total-row { background-color: #007bff; color: white; }
+        .signature-block {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            font-size: 0.9em;
+        }
+        .signature-block div { text-align: center; width: 40%; }
+        .signature-line { border-bottom: 1px solid #333; padding-top: 60px; margin-bottom: 5px; }
+        
+        /* Actions in Quotation View */
+        .quotation-actions { text-align: center; margin-top: 40px; }
+
+        /* --- Print Media Query: Hide UI elements when printing to PDF --- */
+        @media print {
+            body { background-color: #fff !important; } 
+            .container { box-shadow: none; border: none; margin: 0; padding: 0; max-width: none; }
+            .quotation-actions, #status-message {
+                display: none !important; /* Hide buttons and messages */
+            }
+        }
+        /* End Print Media Query */
+
+        /* Mobile adjustment */
+        @media (max-width: 600px) {
+            .container { margin: 15px; padding: 15px; }
+            .two-cols, .signature-block, .quotation-header {
+                grid-template-columns: 1fr;
+                flex-direction: column;
+            }
+            .btn-group { grid-template-columns: 1fr; }
+            .three-cols-size { grid-template-columns: 1fr; }
+            .quotation-header .company-info { text-align: left; margin-top: 10px; }
+            .signature-block div { width: 100%; margin-bottom: 20px; }
+            .quotation-actions button {
+                display: block;
+                width: 100%;
+                margin: 10px 0 !important;
+            }
+            .item-list li { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-content">
+        <!-- ORDER INPUT VIEW -->
+        <div id="order-input-view">
+            <h1>บันทึกรายละเอียดรายการสั่งซื้อ</h1>
+
+            <!-- Message Display Area -->
+            <div id="status-message" class="status-message" style="display: none;"></div>
+
+            <form id="addItemForm">
+                <!-- COMMON FIELDS (Order ID, Customer Name) -->
+                <div class="two-cols">
+                    <div class="form-group">
+                        <label for="orderId">รหัส Order (Job ID)</label>
+                        <input type="text" class="form-control read-only" id="orderId" name="orderId" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerName">ชื่อลูกค้า</label>
+                        <input type="text" class="form-control" id="customerName" name="customerName" required>
+                    </div>
+                </div>
+
+                <!-- PRODUCT TYPE SELECTION -->
+                <div class="form-group">
+                    <label for="productType">ประเภทสินค้า</label>
+                    <select class="form-select" id="productType" name="productType" onchange="toggleFields()" required>
+                        <option value="">-- เลือกประเภทสินค้า --</option>
+                        <option value="มุ้งลวด">มุ้งลวด</option>
+                        <option value="ผ้าม่าน">ผ้าม่าน</option>
+                    </select>
+                </div>
+
+
+                <!-- MUNG LAUET FIELDS (มุ้งลวด) -->
+                <div id="mungLauetFields" class="hidden-fields" style="display: none;">
+                    <h3>ข้อมูลมุ้งลวด</h3>
+
+                    <div class="form-group">
+                        <label for="mungType">1. ประเภทมุ้งลวด</label>
+                        <select class="form-select" id="mungType" name="mungType">
+                            <option value="">-- เลือกประเภทมุ้งลวด --</option>
+                            <option value="บานเลื่อนหน้าต่าง">บานเลื่อนหน้าต่าง</option>
+                            <option value="บานเปิดหน้าต่าง">บานเปิดหน้าต่าง</option>
+                            <option value="บานเปิดห้องน้ำ">บานเปิดห้องน้ำ</option>
+                            <option value="มุ้งจีบหน้าต่าง">มุ้งจีบหน้าต่าง</option>
+                            <option value="บานเลื่อนประตู">บานเลื่อนประตู</option>
+                            <option value="บานเปิดประตู">บานเปิดประตู</option>
+                            <option value="มุ้งจีบประตู">มุ้งจีบประตู</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>2. ขนาดและจำนวน (ซม. และ บาน)</label>
+                        <div class="three-cols-size">
+                            <div class="form-group-compact">
+                                <label for="mungWidth">กว้าง</label>
+                                <input type="number" class="form-control" id="mungWidth" name="mungWidth" min="1" placeholder="กว้าง">
+                            </div>
+                            <div class="form-group-compact">
+                                <label for="mungHeight">สูง</label>
+                                <input type="number" class="form-control" id="mungHeight" name="mungHeight" min="1" placeholder="สูง">
+                            </div>
+                            <div class="form-group-compact">
+                                <label for="mungQuantity">จำนวน</label>
+                                <input type="number" class="form-control" id="mungQuantity" name="mungQuantity" min="1" value="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mungLocation">3. ประตูหรือหน้าต่าง</label>
+                        <select class="form-select" id="mungLocation" name="mungLocation">
+                            <option value="">-- เลือก --</option>
+                            <option value="ประตู">ประตู</option>
+                            <option value="หน้าต่าง">หน้าต่าง</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mungNote">4. หมายเหตุเพิ่มเติม</label>
+                        <textarea class="form-control" id="mungNote" name="mungNote" rows="3"></textarea>
+                    </div>
+
+                    <!-- FIX: Removed 'required' attribute, validation is now in JS -->
+                    <div class="form-group">
+                        <label for="mungPricePerUnit">5. ราคาต่อหน่วย (บาท)</label>
+                        <input type="number" class="form-control" id="mungPricePerUnit" name="mungPricePerUnit" min="0" step="0.01" placeholder="ราคาต่อหน่วย">
+                    </div>
+                </div>
+
+
+                <!-- PA MAAN FIELDS (ผ้าม่าน) -->
+                <div id="paMaanFields" class="hidden-fields" style="display: none;">
+                    <h3>ข้อมูลผ้าม่าน</h3>
+
+                    <div class="form-group">
+                        <label for="curtainType">1. ประเภทผ้าม่าน</label>
+                        <select class="form-select" id="curtainType" name="curtainType">
+                            <option value="">-- เลือกประเภทผ้าม่าน --</option>
+                            <option value="ผ้าม่านจีบ">ผ้าม่านจีบ</option>
+                            <option value="ผ้าม่านตาไก่">ผ้าม่านตาไก่</option>
+                            <option value="ผ้าม่านบานพับ">ผ้าม่านบานพับ</option>
+                            <option value="ผ้าม่านม้วน">ผ้าม่านม้วน</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. ขนาดและจำนวน (ซม. และ บาน)</label>
+                        <div class="three-cols-size">
+                            <div class="form-group-compact">
+                                <label for="curtainWidth">กว้าง</label>
+                                <input type="number" class="form-control" id="curtainWidth" name="curtainWidth" min="1" placeholder="กว้าง">
+                            </div>
+                            <div class="form-group-compact">
+                                <label for="curtainHeight">สูง</label>
+                                <input type="number" class="form-control" id="curtainHeight" name="curtainHeight" min="1" placeholder="สูง">
+                            </div>
+                            <div class="form-group-compact">
+                                <label for="curtainQuantity">จำนวน</label>
+                                <input type="number" class="form-control" id="curtainQuantity" name="curtainQuantity" min="1" value="1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label for="curtainColorCode">3. รหัสสีผ้าม่าน</label>
+                            <input type="text" class="form-control" id="curtainColorCode" name="curtainColorCode">
+                        </div>
+                        <div class="form-group">
+                            <label for="curtainRailCode">4. รหัสแบบรางผ้าม่าน</label>
+                            <input type="text" class="form-control" id="curtainRailCode" name="curtainRailCode">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="curtainLocation">5. ประตูหรือหน้าต่าง</label>
+                        <select class="form-select" id="curtainLocation" name="curtainLocation">
+                            <option value="">-- เลือก --</option>
+                            <option value="ประตู">ประตู</option>
+                            <option value="หน้าต่าง">หน้าต่าง</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="curtainNote">6. หมายเหตุเพิ่มเติม</label>
+                        <textarea class="form-control" id="curtainNote" name="curtainNote" rows="3"></textarea>
+                    </div>
+                    
+                    <!-- FIX: Removed 'required' attribute, validation is now in JS -->
+                    <div class="form-group">
+                        <label for="curtainPricePerUnit">7. ราคาต่อหน่วย (บาท)</label>
+                        <input type="number" class="form-control" id="curtainPricePerUnit" name="curtainPricePerUnit" min="0" step="0.01" placeholder="ราคาต่อหน่วย">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-add">เพิ่มรายการ (บันทึกและกรอกรายการถัดไป)</button>
+            </form>
+
+            <!-- SUB-ITEM SUMMARY AND FINAL SAVE BUTTON -->
+            <div class="summary-box">
+                <h3>รายการย่อยที่เพิ่มแล้ว (<span id="itemCount">0</span> รายการ)</h3>
+                <ul id="subItemList" class="item-list">
+                    <!-- Sub-items will be listed here -->
+                </ul>
+                <p class="running-total">
+                    รวมเงินในรายการย่อยทั้งหมด: <span id="currentSubtotal">0.00</span> บาท
+                </p>
+
+                <div class="btn-group">
+                    <button id="saveOrderButton" class="btn btn-save" disabled>บันทึก Order ทั้งหมด (จบงาน)</button>
+                    <button id="resetOrderButton" class="btn btn-reset">ยกเลิก Order</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- QUOTATION VIEW (Initially hidden) -->
+        <div class="quotation-container" id="quotation-view">
+            <div class="quotation-header">
+                <div>
+                    <h2>ใบเสนอราคา (QUOTATION)</h2>
+                    <p style="font-size: 0.9em;">วันที่ออกใบเสนอราคา: <span id="quotation-date"></span></p>
+                </div>
+                <div class="company-info">
+                    <strong>บริษัท/ร้าน ตัวอย่างมุ้งลวดผ้าม่าน</strong><br>
+                    99/99 ถนนตัวอย่าง แขวง/เขต กรุงเทพฯ 10110<br>
+                    โทร: 02-123-4567 | อีเมล: example@company.com
+                </div>
+            </div>
+
+            <div class="customer-block">
+                <p><strong>เรียน:</strong> <span id="quotation-customer-name"></span></p>
+                <p><strong>รหัส Job ID:</strong> <span id="quotation-job-id"></span></p>
+            </div>
+
+            <table class="quotation-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">ลำดับ</th>
+                        <th class="col-desc" style="width: 45%;">รายการสินค้า/รายละเอียด</th>
+                        <th style="width: 10%;">กว้าง (ซม.)</th>
+                        <th style="width: 10%;">สูง (ซม.)</th>
+                        <th style="width: 10%;">จำนวน (บาน)</th>
+                        <th style="width: 10%;">ราคาต่อหน่วย</th>
+                        <th style="width: 10%;">รวมเงิน</th>
+                    </tr>
+                </thead>
+                <tbody id="quotation-table-body">
+                    <!-- Items will be populated here -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6" class="col-num">รวมราคาสินค้า (Subtotal)</td>
+                        <td class="col-num"><span id="quotation-subtotal"></span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="col-num">ภาษีมูลค่าเพิ่ม (VAT 7%)</td>
+                        <td class="col-num"><span id="quotation-vat"></span></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="6" class="col-num">ยอดรวมทั้งสิ้น (Total)</td>
+                        <td class="col-num"><span id="quotation-total"></span></td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <p style="font-size: 0.8em; margin-top: 5px;">
+                * หมายเหตุ: ราคาที่เสนอมีอายุ 30 วันนับจากวันที่ออกใบเสนอราคา
+            </p>
+
+            <div class="signature-block">
+                <div>
+                    <div class="signature-line"></div>
+                    ( ผู้เสนอราคา )<br>
+                    <small>ตำแหน่ง: พนักงานขาย</small>
+                </div>
+                <div>
+                    <div class="signature-line"></div>
+                    ( ผู้ว่าจ้าง/ลูกค้า )<br>
+                    <small>วันที่อนุมัติ: .......................................</small>
+                </div>
+            </div>
+
+            <div class="quotation-actions">
+                <button id="printQuotationButton" class="btn btn-add" style="width: 200px; margin-right: 15px;">พิมพ์/ส่งเป็น PDF</button>
+                <button id="backToEditButton" class="btn btn-reset" style="width: 200px; margin-right: 15px;">กลับไปแก้ไขรายการ</button>
+                <button id="startNewOrderButton" class="btn btn-save" style="width: 200px;">เริ่ม Order ใหม่</button>
+            </div>
+        </div>
+        <!-- END QUOTATION VIEW -->
+    </div>
+
+    <script>
+        const JOB_ID_KEY = 'current_job_id';
+        const SUB_ITEMS_KEY = 'current_sub_items';
+        
+        let subItems = [];
+        let currentJobID = '';
+        let currentCustomerName = '';
+
+        /** Helper function for formatting numbers (like currency) */
+        const formatCurrency = (num) => {
+            return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+
+        /** Generates a Job ID in the format yyyymmddhhmmss */
+        function generateJobID() {
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const year = now.getFullYear();
+            const month = pad(now.getMonth() + 1);
+            const day = pad(now.getDate());
+            const hour = pad(now.getHours());
+            const minute = pad(now.getMinutes());
+            const second = pad(now.getSeconds());
+            return `${year}${month}${day}${hour}${minute}${second}`;
+        }
+
+        /** Initializes the Job ID from sessionStorage or generates a new one. */
+        function initializeJobID() {
+            let storedJobID = sessionStorage.getItem(JOB_ID_KEY);
+            let storedItems = sessionStorage.getItem(SUB_ITEMS_KEY);
+
+            if (!storedJobID || !storedItems) {
+                // Start a new job
+                currentJobID = generateJobID();
+                subItems = [];
+                currentCustomerName = '';
+                sessionStorage.setItem(JOB_ID_KEY, currentJobID);
+                sessionStorage.setItem(SUB_ITEMS_KEY, JSON.stringify(subItems));
+                displayMessage(`สร้าง Job ID ใหม่: ${currentJobID}`, 'info');
+            } else {
+                // Continue existing job
+                currentJobID = storedJobID;
+                subItems = JSON.parse(storedItems);
+                
+                // Try to restore customer name if items exist
+                currentCustomerName = subItems.length > 0 ? subItems[0].customerName : '';
+                
+                displayMessage(`กำลังดำเนินการต่อ Job ID: ${currentJobID} มี ${subItems.length} รายการ`, 'info');
+            }
+
+            document.getElementById('orderId').value = currentJobID;
+            document.getElementById('customerName').value = currentCustomerName;
+            
+            // Lock customer name if items already exist
+            updateCustomerNameLock();
+        }
+
+        /** Locks the customer name field if items are already added */
+        function updateCustomerNameLock() {
+             const customerNameInput = document.getElementById('customerName');
+             if (subItems.length > 0) {
+                 customerNameInput.readOnly = true;
+                 customerNameInput.classList.add('read-only');
+             } else {
+                 customerNameInput.readOnly = false;
+                 customerNameInput.classList.remove('read-only');
+             }
+        }
+
+        /** Renders the list of added sub-items and updates the count/button state. */
+        function renderSubItems() {
+            const list = document.getElementById('subItemList');
+            const itemCount = document.getElementById('itemCount');
+            const saveButton = document.getElementById('saveOrderButton');
+            const currentSubtotalElement = document.getElementById('currentSubtotal');
+
+            list.innerHTML = '';
+            let runningSubtotal = 0;
+
+            subItems.forEach((item, index) => {
+                // Use the stored pricePerUnit from itemData
+                const pricePerUnit = item.pricePerUnit; 
+                const quantity = item.mungQuantity || item.curtainQuantity;
+                const totalItemPrice = pricePerUnit * quantity;
+                runningSubtotal += totalItemPrice;
+                // --- END PRICE LOGIC ---
+
+
+                const li = document.createElement('li');
+                let detail = `<div class="details"><b>รายการที่ ${index + 1} (${item.productType}):</b> `;
+                let size = '';
+
+                if (item.productType === 'มุ้งลวด') {
+                    size = `${item.mungWidth}x${item.mungHeight} ซม.`;
+                    detail += `${item.mungType} (${item.mungLocation}, ${size}) จำนวน ${quantity} บาน.</div>`;
+                } else if (item.productType === 'ผ้าม่าน') {
+                    size = `${item.curtainWidth}x${item.curtainHeight} ซม.`;
+                    detail += `${item.curtainType} (${item.curtainLocation}, ${size}) รหัสสี: ${item.curtainColorCode}, จำนวน ${quantity} บาน.</div>`;
+                }
+                
+                // Add price information to the list item, showing the actual calculated unit price
+                const priceInfo = `<div class="price-info">[หน่วยละ: ${formatCurrency(pricePerUnit)} | รวม: ${formatCurrency(totalItemPrice)}]</div>`;
+
+                li.innerHTML = detail + priceInfo;
+                list.appendChild(li);
+            });
+
+            itemCount.textContent = subItems.length;
+            currentSubtotalElement.textContent = formatCurrency(runningSubtotal);
+            saveButton.disabled = subItems.length === 0;
+            updateCustomerNameLock();
+        }
+
+        /** Resets the form for the next sub-item entry. */
+        function resetItemForm() {
+            // Keep customerName for continuity
+            const customerName = document.getElementById('customerName').value;
+            
+            document.getElementById('addItemForm').reset();
+            
+            // Restore persistent fields and reset quantity/size
+            document.getElementById('orderId').value = currentJobID;
+            document.getElementById('customerName').value = customerName;
+            document.getElementById('mungQuantity').value = '1';
+            document.getElementById('curtainQuantity').value = '1';
+            
+            toggleFields(); // Hide detailed sections
+        }
+        
+        /** Shows or hides the correct detail fields (Mung Lauet or Pa Maan) */
+        window.toggleFields = function() {
+            const productType = document.getElementById('productType').value;
+            document.getElementById('mungLauetFields').style.display = (productType === 'มุ้งลวด') ? 'block' : 'none';
+            document.getElementById('paMaanFields').style.display = (productType === 'ผ้าม่าน') ? 'block' : 'none';
+        }
+
+        /** Displays status messages. */
+        function displayMessage(message, type) {
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+            statusMessage.style.display = 'block';
+            
+            if (type !== 'info') {
+                 setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        /**
+         * Renders the final quotation and switches to the quotation view.
+         */
+        function renderQuotation(payload) {
+            const today = new Date().toLocaleDateString('th-TH', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+            });
+
+            document.getElementById('quotation-date').textContent = today;
+            document.getElementById('quotation-customer-name').textContent = payload.customerName;
+            document.getElementById('quotation-job-id').textContent = payload.jobId;
+            
+            const tableBody = document.getElementById('quotation-table-body');
+            tableBody.innerHTML = '';
+            
+            let subtotal = 0;
+            
+            payload.items.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                
+                // Use the stored pricePerUnit
+                const pricePerUnit = item.pricePerUnit; 
+                const quantity = item.mungQuantity || item.curtainQuantity;
+                const totalItemPrice = pricePerUnit * quantity;
+                subtotal += totalItemPrice;
+
+                let description = '';
+                let width = '';
+                let height = '';
+                
+                if (item.productType === 'มุ้งลวด') {
+                    width = item.mungWidth;
+                    height = item.mungHeight;
+                    description = `${item.mungType} (${item.mungLocation}). หมายเหตุ: ${item.mungNote || '-'}`;
+                } else if (item.productType === 'ผ้าม่าน') {
+                    width = item.curtainWidth;
+                    height = item.curtainHeight;
+                    description = `${item.curtainType} รหัสสี: ${item.curtainColorCode}, รหัสราง: ${item.curtainRailCode}. หมายเหตุ: ${item.curtainNote || '-'}`;
+                }
+
+                tr.innerHTML = `
+                    <td style="text-align: center;">${index + 1}</td>
+                    <td class="col-desc">${description}</td>
+                    <td style="text-align: center;">${width}</td>
+                    <td style="text-align: center;">${height}</td>
+                    <td style="text-align: center;">${quantity}</td>
+                    <td class="col-num">${formatCurrency(pricePerUnit)}</td>
+                    <td class="col-num">${formatCurrency(totalItemPrice)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Calculate totals
+            const vat = subtotal * 0.07;
+            const total = subtotal + vat;
+
+            document.getElementById('quotation-subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('quotation-vat').textContent = formatCurrency(vat);
+            document.getElementById('quotation-total').textContent = formatCurrency(total);
+            
+            // Switch view
+            document.getElementById('order-input-view').style.display = 'none';
+            document.getElementById('quotation-view').style.display = 'block';
+        }
+        
+        /** Switches back to the input form view WITHOUT clearing state (for editing) */
+        function backToInputView() {
+            document.getElementById('quotation-view').style.display = 'none';
+            document.getElementById('order-input-view').style.display = 'block';
+            displayMessage(`กลับมาหน้า Order ID: ${currentJobID} เพื่อแก้ไข`, 'info');
+        }
+
+        /** Switches back to the input form view and resets state (starting new order) */
+        function startNewOrder() {
+            sessionStorage.removeItem(JOB_ID_KEY);
+            sessionStorage.removeItem(SUB_ITEMS_KEY);
+
+            document.getElementById('quotation-view').style.display = 'none';
+            document.getElementById('order-input-view').style.display = 'block';
+            
+            initializeJobID(); // This generates a new ID and resets subItems
+            renderSubItems();
+            resetItemForm();
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeJobID();
+            renderSubItems();
+            toggleFields();
+
+            const addItemForm = document.getElementById('addItemForm');
+            const saveOrderButton = document.getElementById('saveOrderButton');
+            const resetOrderButton = document.getElementById('resetOrderButton');
+            
+            // Quotation Action Buttons
+            const printQuotationButton = document.getElementById('printQuotationButton');
+            const backToEditButton = document.getElementById('backToEditButton');
+            const startNewOrderButton = document.getElementById('startNewOrderButton');
+            
+            // Event Listeners for Quotation Actions
+            printQuotationButton.addEventListener('click', () => {
+                window.print();
+            });
+            backToEditButton.addEventListener('click', backToInputView);
+            startNewOrderButton.addEventListener('click', startNewOrder);
+
+
+            // --- 1. ADD SUB-ITEM HANDLER ---
+            addItemForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // 1. Validation and Data Collection
+                const productType = document.getElementById('productType').value;
+                const customerName = document.getElementById('customerName').value.trim();
+
+                if (!productType || !customerName) {
+                    displayMessage('กรุณาเลือกประเภทสินค้าและระบุชื่อลูกค้า', 'error');
+                    return;
+                }
+
+                const itemData = {
+                    orderId: currentJobID, 
+                    customerName: customerName,
+                    productType: productType
+                };
+
+                const formData = new FormData(addItemForm);
+                
+                let quantity = 0;
+                let pricePerUnit = 0;
+
+                if (productType === 'มุ้งลวด') {
+                    itemData.mungType = formData.get('mungType');
+                    itemData.mungWidth = parseInt(formData.get('mungWidth')) || 0;
+                    itemData.mungHeight = parseInt(formData.get('mungHeight')) || 0;
+                    itemData.mungLocation = formData.get('mungLocation');
+                    itemData.mungQuantity = parseInt(formData.get('mungQuantity')) || 0;
+                    itemData.mungNote = formData.get('mungNote');
+                    
+                    // Collect price field
+                    itemData.pricePerUnit = parseFloat(formData.get('mungPricePerUnit')) || 0; 
+
+                    quantity = itemData.mungQuantity;
+                    pricePerUnit = itemData.pricePerUnit;
+
+                    // Custom Validation for Mung Lauet (Replaces HTML required)
+                    if (!itemData.mungType || !itemData.mungLocation || itemData.mungWidth < 1 || itemData.mungHeight < 1 || itemData.mungQuantity < 1 || pricePerUnit <= 0) {
+                         displayMessage('กรุณากรอกข้อมูลมุ้งลวดให้ครบถ้วน: ประเภท, ประตู/หน้าต่าง, ขนาด(กว้าง,สูง), จำนวน, และ ราคาต่อหน่วย (ต้องมากกว่า 0)', 'error');
+                         return;
+                    }
+
+                } else if (productType === 'ผ้าม่าน') {
+                    itemData.curtainType = formData.get('curtainType');
+                    itemData.curtainWidth = parseInt(formData.get('curtainWidth')) || 0;
+                    itemData.curtainHeight = parseInt(formData.get('curtainHeight')) || 0;
+                    itemData.curtainColorCode = formData.get('curtainColorCode');
+                    itemData.curtainRailCode = formData.get('curtainRailCode');
+                    itemData.curtainLocation = formData.get('curtainLocation');
+                    itemData.curtainQuantity = parseInt(formData.get('curtainQuantity')) || 0;
+                    itemData.curtainNote = formData.get('curtainNote');
+                    
+                    // Collect price field
+                    itemData.pricePerUnit = parseFloat(formData.get('curtainPricePerUnit')) || 0;
+                    
+                    quantity = itemData.curtainQuantity;
+                    pricePerUnit = itemData.pricePerUnit;
+                    
+                    // Custom Validation for Pa Maan (Replaces HTML required)
+                    if (!itemData.curtainType || !itemData.curtainLocation || itemData.curtainWidth < 1 || itemData.curtainHeight < 1 || itemData.curtainQuantity < 1 || pricePerUnit <= 0) {
+                         displayMessage('กรุณากรอกข้อมูลผ้าม่านให้ครบถ้วน: ประเภท, ประตู/หน้าต่าง, ขนาด(กว้าง,สูง), จำนวน, และ ราคาต่อหน่วย (ต้องมากกว่า 0)', 'error');
+                         return;
+                    }
+                }
+
+                // If this is the first item, set the customer name in memory
+                if (subItems.length === 0) {
+                     currentCustomerName = customerName;
+                }
+                
+                // 2. Add to array and sessionStorage
+                subItems.push(itemData);
+                sessionStorage.setItem(SUB_ITEMS_KEY, JSON.stringify(subItems));
+
+                // 3. Update UI and reset form
+                renderSubItems();
+                resetItemForm(); 
+                
+                displayMessage(`เพิ่มรายการย่อยสำหรับ Job ID ${currentJobID} เรียบร้อยแล้ว`, 'success');
+            });
+
+            // --- 2. SAVE ORDER HANDLER (Final Submission & Quotation Display) ---
+            saveOrderButton.addEventListener('click', async () => {
+                if (subItems.length === 0) {
+                    displayMessage('กรุณาเพิ่มรายการย่อยอย่างน้อย 1 รายการ', 'error');
+                    return;
+                }
+                
+                // Final payload preparation
+                const finalOrderPayload = {
+                    jobId: currentJobID,
+                    customerName: document.getElementById('customerName').value,
+                    items: subItems
+                };
+                
+                displayMessage('กำลังบันทึก Order ทั้งหมด...', 'info');
+
+                // --- Mock Server Submission (Simulating save success) ---
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 1000)); 
+                    
+                    // 1. Render the quotation with the final payload
+                    renderQuotation(finalOrderPayload);
+                    
+                    // 2. Display final success message
+                    displayMessage(`Order ID: ${currentJobID} บันทึกสำเร็จแล้ว! กำลังแสดงใบเสนอราคา`, 'success');
+
+                } catch (error) {
+                    displayMessage('เกิดข้อผิดพลาดในการบันทึก Order', 'error');
+                }
+            });
+
+            // --- 3. RESET ORDER HANDLER (Cancel) ---
+            resetOrderButton.addEventListener('click', () => {
+                 // Using a custom modal/dialog is preferred in a real app, but using window.confirm for simplicity in this context.
+                 // NOTE: Using a custom modal is preferred over window.confirm/alert in Canvas environment.
+                 if (confirm(`คุณแน่ใจหรือไม่ที่จะยกเลิก Order ID: ${currentJobID}? ข้อมูลรายการย่อยที่เพิ่มไว้จะถูกลบทิ้งทั้งหมด`)) {
+                    startNewOrder(); // Use the same function to clear session and reset UI
+                    displayMessage('ยกเลิก Order และเริ่ม Job ID ใหม่เรียบร้อย', 'info');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
