@@ -4,60 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตารางการติดตั้งผ้าม่านลูกค้า</title>
-    <!-- ลิงก์ไปยังไฟล์ CSS ที่รวบรวมไว้ -->
-    <!-- แก้ไขลิงก์ CSS ตามที่คุณต้องการ -->
     <link rel="stylesheet" href="/css/stylesheet.css"> 
-    
-    <!-- เพิ่มสไตล์เบื้องต้นสำหรับ User Info ในกรณีที่ CSS ภายนอกไม่มี -->
-    <style>
-        .user-status {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .user-status p {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .logout-btn {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #e57373;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.9em;
-            transition: background-color 0.2s;
-        }
-        .logout-btn:hover {
-            background-color: #d32f2f;
-        }
-    </style>
 </head>
 <body>
 
     <div class="dashboard-layout">
         
-        <!-- Sidebar -->
         <div class="sidebar">
-            <div class="logo">Curtain Schedule</div>
+            <div class="logo">BackOffice</div>
 
-            <!-- เพิ่มส่วนแสดงข้อมูลผู้ใช้และปุ่ม Logout -->
             <div class="user-status">
                 <p>ผู้ใช้งาน:</p>
                 <p><%= user.DisplayName %></p>
                 <a href="/logout" class="logout-btn">ออกจากระบบ</a>
             </div>
-            <!-- สิ้นสุดส่วนแสดงข้อมูลผู้ใช้ -->
-
             <nav>
+                <a href="/input_order" class="nav-item">
+                    + ทำ Order ใหม่
+                </a>
+                <a href="/search_order" class="nav-item">
+                    ค้นหา/แก้ไข Order
+                </a>
+                <hr style="border-top: 1px solid #eee; margin: 10px 0;">
                 <a href="/schedule" class="nav-item active">ตารางติดตั้ง</a>
-                <a href="#" class="nav-item">รายงาน</a>
+                <a href="/report" class="nav-item">รายงาน</a>
             </nav>
         </div>
 
-        <!-- Main Content (ตาราง) -->
         <div class="main-content">
             <div class="schedule-header">
                 <h2>ตารางงานติดตั้งประจำสัปดาห์</h2>
@@ -66,13 +39,11 @@
                         <option value="all">ทีมช่างทั้งหมด</option>
                         <option value="team-a">ทีมช่าง A</option>
                         <option value="team-b">ทีมช่าง B</option>
-                        <!-- เพิ่มทีมอื่นๆ -->
-                    </select>
+                        </select>
                     <button id="prev-week-btn" class="nav-btn">ก่อนหน้า</button>
                     <span id="current-week-range"></span>
                     <button id="next-week-btn" class="nav-btn">ถัดไป</button>
-                    <!-- เปลี่ยน button เป็น link เพื่อไปหน้าเพิ่มงาน -->																	 
-                    <button class="add-btn">+ เพิ่มงานใหม่</button>
+                    <button href="/input_schedule" class="add-btn">+ เพิ่มงานใหม่</button>
                 </div>
             </div>
 
@@ -81,8 +52,7 @@
                     <strong>เกิดข้อผิดพลาด:</strong> <%= dbError %>
                 </div>
             <% } %>
-<!-- *** FIX: schedule-container พร้อม overflow-x: auto *** -->
-            <div class="schedule-container">
+<div class="schedule-container">
                 <table class="schedule-table">
                     <thead>
                         <tr>
@@ -97,13 +67,10 @@
                         </tr>
                     </thead>
                     <tbody id="schedule-body">
-                        <!-- ตารางจะถูกสร้างโดย JavaScript -->
                         <% if (jobs && jobs.length > 0) { %>
                             <% jobs.forEach(job => { %>
-                                <!-- ตัวอย่างข้อมูลที่ถูก Render จาก EJS -->
                                 <tr>
                                     <td><%= job.time %></td>
-                                    <!-- ตรงนี้ควรถูกแทนที่ด้วย logic การแสดงผลตามวันใน JS/EJS ที่ซับซ้อนกว่านี้ -->
                                     <td colspan="7">งาน: <%= job.customer %> | ทีม: <%= job.team %> | วันที่: <%= job.date %></td>
                                 </tr>
                             <% }) %>
@@ -113,14 +80,11 @@
             </div>
         </div>
 
-        <!-- Right Sidebar (งานที่กำลังจะมาถึง) -->
         <div class="right-sidebar">
             <h3>งานที่กำลังจะมาถึง</h3>
             <div id="upcoming-jobs-list" class="job-list">
-                <!-- รายการงานจะถูกสร้างโดย JavaScript -->
                 <% if (jobs && jobs.length > 0) { %>
                     <% jobs.slice(0, 3).forEach(job => { %>
-                        <!-- ตัวอย่างแสดงรายการงานที่กำลังจะมาถึง -->
                         <div class="job-item">
                             <p><strong><%= job.customer %></strong></p>
                             <p><%= job.date %> @ <%= job.time %> (ทีม <%= job.team %>)</p>
@@ -132,7 +96,6 @@
 
     </div>
 
-    <!-- 1. ต้องกำหนดตัวแปร liveJobs และ currentUser ก่อนไฟล์ schedule.js จะถูกโหลด -->
     <script>
         // ข้อมูลผู้ใช้ที่ล็อกอินอยู่
         const currentUser = {
@@ -148,7 +111,6 @@
     </script>
     
 
-    <!-- 2. โหลดไฟล์ JavaScript หลัก ซึ่งตอนนี้สามารถเข้าถึง liveJobs ได้แล้ว -->
     <script src="/js/schedule.js"></script> 
 
 </body>

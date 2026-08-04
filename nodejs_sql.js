@@ -388,6 +388,13 @@ async function startServer() {
           
                                           
         });
+
+        // 2. VIEW: Display input form - ใช้ isAuthenticated และ isAuthorized
+        app.get("/input_order", isAuthenticated, isAuthorized, (req, res) => {
+            res.render('input_order', { user: req.user });
+          
+                                          
+        });
  
     
 

@@ -1,12 +1,19 @@
+/*
+ * stylesheet.css - Minimalist Theme
+ * Full version including Dashboard, Form, Modal, and Print Styles.
+ */
+
 /* ====================================
-    1. LAYOUT & GLOBAL STYLES
-    ==================================== */
+   1. LAYOUT & GLOBAL STYLES (Minimalist Theme)
+   ==================================== */
 body {
-    font-family: 'Inter', sans-serif, Arial;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f7f6;
-    color: #333;
+    background-color: #f7f7f7; /* Light Gray Canvas */
+    color: #333333; /* Dark Gray Text */
+    line-height: 1.5;
+    font-size: 14px; /* ลดขนาด Font หลัก */
 }
 
 .dashboard-layout {
@@ -16,57 +23,83 @@ body {
 }
 
 /* ====================================
-    2. SIDEBAR (แถบเมนูด้านซ้าย)
-    ==================================== */
+   2. SIDEBAR (แถบเมนูซ้าย - Clean & Minimal)
+   ==================================== */
 .sidebar {
-    width: 250px;
-    background-color: #2c3e50;
-    color: white;
+    width: 220px; /* ลดความกว้าง Sidebar */
+    background-color: #ffffff; /* White Sidebar */
+    color: #333333;
     padding-top: 20px;
-    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 0 5px rgba(0, 0, 0, 0.05); /* Shadow บางมาก */
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    border-right: 1px solid #e0e0e0;
 }
 
 .sidebar .logo {
-    font-size: 1.8em;
-    font-weight: 800;
+    font-size: 1.5em; /* ลดขนาด Logo */
+    font-weight: 700;
     text-align: center;
-    margin-bottom: 40px;
-    color: #3498db;
+    margin-bottom: 25px;
+    color: #34495e; /* Primary Accent Color */
 }
+
+.user-status {
+    padding: 0 15px 10px 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.9em; /* ลดขนาด Font */
+    color: #666;
+}
+.user-status p { margin: 3px 0; font-weight: 400; }
+
+.logout-btn {
+    display: block;
+    padding: 7px 10px;
+    background-color: #e74c3c;
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin: 10px 15px 0;
+}
+.logout-btn:hover { background-color: #c0392b; }
 
 .sidebar nav {
     padding: 0 10px;
 }
 
 .nav-item {
-    display: block;
-    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px; /* ลด Padding */
     text-decoration: none;
-    color: #bdc3c7;
-    border-radius: 8px;
-    transition: background-color 0.3s, color 0.3s;
+    color: #333333;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
     margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9em;
 }
 
 .nav-item:hover {
-    background-color: #34495e;
-    color: #f0f0f0;
+    background-color: #f0f0f0; /* Light Gray Hover */
 }
 
 .nav-item.active {
-    background-color: #3498db;
+    background-color: #34495e; /* Accent Color */
     color: white; 
-    font-weight: bold;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
 }
+.nav-item i { margin-right: 10px; font-size: 1em; } 
 
 /* ====================================
-    3. MAIN CONTENT (เนื้อหาหลัก: ตาราง)
-    ==================================== */
+   3. MAIN CONTENT & HEADER
+   ==================================== */
 .main-content {
     flex-grow: 1;
-    padding: 20px 30px; 
+    padding: 25px; /* ลด Padding */
     max-width: 100%;
     overflow-x: hidden;
 }
@@ -76,235 +109,213 @@ body {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding: 10px;
+    margin-bottom: 20px; /* ลด Margin */
+    padding: 15px; /* ลด Padding */
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
 }
 
 .schedule-header h2 {
-    color: #2c3e50;
-    font-size: 1.6em;
+    color: #333333;
+    font-size: 1.5em; /* ลดขนาด Heading */
     margin: 0;
+    font-weight: 600;
 }
 
 .schedule-header .controls {
     display: flex;
-    gap: 10px;
+    gap: 8px; /* ลด Gap */
     align-items: center;
     flex-wrap: wrap; 
-    margin-top: 5px; 
 }
 
 .schedule-header button, 
 .schedule-header select {
-    padding: 10px 15px;
-    border-radius: 6px;
+    padding: 8px 15px; /* ลด Padding */
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s, transform 0.1s;
-    border: 1px solid #bdc3c7;
+    font-weight: 500;
+    font-size: 0.9em; /* ลดขนาด Font */
+    transition: background-color 0.2s;
+    border: 1px solid #ced4da;
 }
 
-.nav-btn { /* ปุ่มเปลี่ยนสัปดาห์ */
-    background-color: #ecf0f1;
-    border: none;
-    color: #34495e;
+.nav-btn {
+    background-color: #ffffff;
+    color: #495057;
 }
 
 .nav-btn:hover {
-    background-color: #bdc3c7;
+    background-color: #f0f0f0;
 }
 
 .add-btn {
-    background-color: #2ecc71; /* สีเขียว */
+    background-color: #34495e; /* Accent Color */
     color: white;
     border: none;
-    font-weight: bold;
-    box-shadow: 0 3px 0 #27ae60;
+    font-weight: 600;
 }
 
-.add-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 1px 0 #27ae60;
+.add-btn:hover {
+    background-color: #2c3e50;
 }
 
 /* ====================================
-    4. SCHEDULE TABLE (ตารางปฏิทิน)
-    ==================================== */
+   4. SCHEDULE TABLE (ตาราง - เล็กลงและอ่านง่าย)
+   ==================================== */
 .schedule-container {
-    overflow-x: auto; /* สำคัญมากสำหรับ responsive table */
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background-color: white;
+    border: 1px solid #e0e0e0;
 }
 
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
-    min-width: 1200px; /* กำหนดความกว้างขั้นต่ำของตาราง */
+    min-width: 1000px; /* ลด Min Width เล็กน้อย */
+    font-size: 0.85em; /* ลดขนาด Font ในตาราง */
 }
 
 .schedule-table th, .schedule-table td {
-    border: 1px solid #ecf0f1;
-    padding: 10px;
+    border: 1px solid #f0f0f0; /* เส้นแบ่งที่จางลง */
+    padding: 8px 6px; /* ลด Padding */
     text-align: center;
-    min-width: 140px; 
+    min-width: 100px; /* ลด Min Width */
     vertical-align: top;
-    height: 50px;
+    height: 40px; /* ลดความสูงเซลล์ */
 }
 
 .schedule-table th {
-    background-color: #f8f9fa;
-    color: #34495e;
+    background-color: #f7f7f7;
+    color: #333333;
     font-weight: 600;
     position: sticky;
     top: 0;
-    height: 30px;
+    height: 35px; /* ลดความสูง Header */
 }
 
-/* ทำให้คอลัมน์แรกแคบลง (คงไว้ตามคำขอเดิม) */
 .schedule-table th:first-child, 
 .schedule-table td:first-child {
-    min-width: 80px; 
-    width: 80px; 
-    font-weight: 700; 
-    color: #2c3e50;
-    background-color: #f0f3f5; 
+    min-width: 60px; 
+    width: 60px; 
+    font-weight: 500; 
+    color: #34495e;
+    background-color: #f7f7f7; 
 }
 
-/* --- Job Card Styling (คงไว้) --- */
+/* --- Job Card Styling (Minimal) --- */
 .job-card {
-    background-color: #eaf6ff;
-    border-radius: 4px;
-    padding: 5px;
-    margin-bottom: 5px;
+    background-color: #ecf0f1;
+    border-radius: 3px;
+    padding: 4px; /* ลด Padding */
+    margin-bottom: 4px; /* ลด Margin */
     cursor: pointer;
-					  
     text-align: left;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border-left: 4px solid #3498db;
-    font-size: 0.9em;
-    word-wrap: break-word;
+    transition: all 0.2s;
+    border-left: 3px solid;
+    font-size: 0.9em; /* ลดขนาด Font ใน Card */
 }
 
 .job-card:hover {
-    transform: translateY(-2px);
-						   
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .job-card strong {
     display: block;
     font-size: 1em;
-    color: #2c3e50;
+    color: #333333;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 600;
 }
 
 .job-card small {
     display: block;
-    color: #7f8c8d;
+    color: #666;
+    font-size: 0.85em;
 }
-															   
-															   
-
-/* Job Card Status Colors (คงไว้) */
-.status-scheduled { border-left-color: #3498db; background-color: #eaf6ff; }
-.status-inprogress { border-left-color: #f39c12; background-color: #fff8e8; }
-.status-completed { border-left-color: #27ae60; background-color: #e9fbf0; }
-.status-cancelled { border-left-color: #e74c3c; background-color: #ffeaea; }
+    
+/* Job Card Status Colors (ใช้สีที่ดูสงบ) */
+.status-scheduled { border-left-color: #34495e; background-color: #eef2f7; }
+.status-inprogress { border-left-color: #f39c12; background-color: #fff9e8; }
+.status-completed { border-left-color: #27ae60; background-color: #e9f7ee; }
+.status-cancelled { border-left-color: #c0392b; background-color: #f9ebea; }
 
 
 /* ====================================
-    5. RIGHT SIDEBAR (แถบงานที่จะมาถึง)
-    ==================================== */
-										   
+   5. RIGHT SIDEBAR (แถบงานที่จะมาถึง)
+   ==================================== */
 .right-sidebar {
-				  
+    width: 250px; /* ลดความกว้าง */
     background-color: #ffffff;
-    padding: 20px;
-												
-    border-left: 1px solid #ecf0f1;
-					 
-				   
+    padding: 20px 15px; /* ลด Padding */
+    box-shadow: -1px 0 5px rgba(0, 0, 0, 0.05); 
+    border-left: 1px solid #e0e0e0;
+    overflow-y: auto;
+    flex-shrink: 0;
 }
 
 .right-sidebar h3 {
-				  
-						
-    color: #2c3e50;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #ecf0f1;
-    padding-bottom: 10px;
-					 
- 
-
-		   
-				  
-						   
-			  
+    color: #34495e;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
+    font-size: 1.2em; /* ลดขนาด Heading */
+    font-weight: 600;
 }
 
 .upcoming-job-item {
-    padding: 10px;
-    margin-bottom: 10px;
-							  
+    padding: 8px; /* ลด Padding */
+    margin-bottom: 8px; /* ลด Margin */
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9em;
+    font-size: 0.85em; /* ลดขนาด Font */
     transition: background-color 0.2s;
+    border: 1px solid #f0f0f0;
 }
 
 .upcoming-job-item:hover {
-    background-color: #f4f6f9;
-											  
+    background-color: #f7f7f7;
 }
 
 .upcoming-job-item strong {
-					 
-				   
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
+    color: #333333;
+    font-weight: 500;
 }
 
 .upcoming-job-item .date-info {
     font-size: 0.8em;
-    color: #7f8c8d;
-    display: block;
-					
+    color: #666;
 }
 
 .upcoming-job-item .status-text {
     display: inline-block;
     padding: 2px 6px;
     margin-top: 5px;
-					 
     border-radius: 3px;
-    font-size: 0.75em;
+    font-size: 0.7em;
     font-weight: bold;
     color: white;
 }
 
-/* Upcoming Job Status Colors (คงไว้) */
-									
-																						 
-																					  
-																				   
-																				   
-
-.upcoming-job-item.status-scheduled .status-text { background-color: #3498db; }
-																						  
+/* Upcoming Job Status Colors */
+.upcoming-job-item.status-scheduled .status-text { background-color: #34495e; }
 .upcoming-job-item.status-inprogress .status-text { background-color: #f39c12; }
 .upcoming-job-item.status-completed .status-text { background-color: #27ae60; }
-.upcoming-job-item.status-cancelled .status-text { background-color: #e74c3c; }
+.upcoming-job-item.status-cancelled .status-text { background-color: #c0392b; }
 
 
 /* ====================================
-    6. MODAL STYLES (สำหรับ Partial View: Input/Edit)
-    ==================================== */
+   6. MODAL STYLES (Minimal & Compact) - สำหรับ Job/Edit Modal อื่นๆ
+   ==================================== */
 .modal {
     display: none; 
     position: fixed; 
@@ -313,24 +324,31 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.6);
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.3); /* Darker Overlay for Contrast */
+    /* เพิ่ม: จัดให้อยู่กึ่งกลางหน้าจอสำหรับ modals ที่ไม่ใช่ quotation */
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+}
+/* รีเซ็ต display: none ในโค้ดก่อนหน้า เพราะถูกซ้ำในส่วน Quotation Modal */
+.modal:not(.quotation-modal) {
+    display: none;
 }
 
+
 .modal-content {
-    background-color: #ffffff; /* ปรับเป็นสีขาวบริสุทธิ์ */
-    margin: 2% auto; 
-    padding: 25px; 
+    background-color: #ffffff;
+    margin: 4% auto; 
+    padding: 20px; 
     border: none;
-    width: 95%; 
-    max-width: 800px; 
-    border-radius: 12px;
+    width: 90%; 
+    max-width: 600px; 
+    border-radius: 6px;
     position: relative;
-    /* ปรับ box-shadow ให้ดูสวยงาม นุ่มนวล และมีมิติมากขึ้น */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1); 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
     animation-name: animatetop;
-    animation-duration: 0.4s;
-    transition: transform 0.3s ease;
+    animation-duration: 0.3s;
 }
 
 @keyframes animatetop {
@@ -339,551 +357,735 @@ body {
 }
 
 .close-btn {
-    color: #95a5a6;
+    color: #999;
     float: right;
-    font-size: 32px;
+    font-size: 24px; 
     font-weight: 300;
     cursor: pointer;
     line-height: 1;
-    margin-top: -15px; 
-    margin-right: -10px;
-    transition: color 0.2s;
+    margin-top: -5px; 
+    margin-right: -2px;
 }
 
 .close-btn:hover,
 .close-btn:focus {
-    color: #c0392b;
+    color: #333333;
     text-decoration: none;
 }
 
 /* ====================================
-    7. INPUT FORM STYLES (สำหรับ input_schedule.ejs)
-    ==================================== */
-																
-										   
+   7. INPUT FORM STYLES (Minimalist)
+   ==================================== */
 
-																	   
-				 
-			   
-								  
-					 
-					
-			  
-					 
- 
+/* 7.5: ORDER INPUT VIEW CONTAINER (ปรับความกว้าง) */
+/* ====================================
+   7. INPUT FORM STYLES (Minimalist)
+   ==================================== */
+
+/* 7.5: ORDER INPUT VIEW CONTAINER (ปรับความกว้าง) */
+#order-input-view, .container {
+    max-width: 900px; /* ความกว้างสูงสุดของ Form Input */
+    /* 💥 แก้ไขตรงนี้: ลด margin-top เหลือ 0 หรือ 15px */
+    margin: 0px auto; 
+    
+    background: #fff; 
+    padding: 25px; 
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+    border: 1px solid #e0e0e0;
+    width: 95%; 
+}
+
+
 .form-title {
     margin-top: 0;
-    margin-bottom: 25px;
-    color: #3498db;
-    border-bottom: 1px solid #ecf0f1;
+    margin-bottom: 20px;
+    color: #34495e;
+    border-bottom: 1px solid #e0e0e0;
     padding-bottom: 10px;
-						
-					 
-					 
- 
-																			
-				  
-			  
-						
-				
- 
-							 
-				
-					 
+    text-align: left;
+    font-size: 1.4em; 
+    font-weight: 600;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #fcfcfc;
 }
 
 .form-group {
-			  
-    margin-bottom: 15px;
-    width: 48%; 
-						
-}
-
-.form-group-row {
-				   
-			  
- 
-
-			   
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-			 
-				  
-						   
-						
-								
- 
-
-.form-group.full-width {
+    margin-bottom: 15px; 
     width: 100%;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #2c3e50;
-    font-size: 0.95em;
+    margin-bottom: 5px; 
+    font-weight: 500;
+    color: #333333;
+    font-size: 0.9em; 
 }
 
+.form-control, 
+.form-select,
 .form-group input[type="text"],
 .form-group input[type="date"],
+.form-group input[type="number"],
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 8px 10px; 
+    border: 1px solid #ced4da;
     border-radius: 4px;
-    font-size: 1em;
-				
-							
-							  
-    transition: border-color 0.3s;
+    font-size: 14px; 
+    box-sizing: border-box;
+    background-color: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="date"]:focus,
+.form-control:focus, 
+.form-select:focus,
+.form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    border-color: #3498db;
-												  
+    border-color: #34495e;
     outline: none;
-							
+    box-shadow: 0 0 0 2px rgba(52, 73, 94, 0.2); 
 }
 
 .form-group textarea {
-    resize: vertical;
-    min-height: 80px;
+    min-height: 80px; 
 }
 
+/* Layout Utilities for Forms */
+.two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px; 
+}
+
+.three-cols-size { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 10px; 
+    margin-top: 5px; 
+}
+
+.form-group-compact { margin-bottom: 0; }
+.form-group-compact label { font-size: 0.85em; margin-bottom: 3px; }
+
+/* Form Actions */
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    margin-top: 25px;
-				
+    gap: 10px; 
+    margin-top: 20px; 
+}
+#addItemForm .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
-/* --- UPDATED BUTTON BASE STYLES (รวมทุกปุ่มตามที่คุณเคยแก้ไขล่าสุด) --- */
-.submit-btn, .cancel-btn, .delete-btn, .remove-btn { 
-    padding: 12px 25px; 
+
+/* --- UPDATED BUTTON STYLES (Minimalist) --- */
+.submit-btn, .cancel-btn, .delete-btn, .remove-btn, .btn, .btn-add, .btn-save, .btn-reset,
+#addItemForm button { 
+    padding: 8px 20px; 
     border: none;
-    border-radius: 6px; 
+    border-radius: 4px; 
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     transition: all 0.2s; 
+    font-size: 14px; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-			 
-							   
-							  
- 
-
-.submit-btn {
-    background-color: #3498db;
+.submit-btn, .btn-add, #addItemForm button[type="submit"] {
+    background-color: #34495e; 
     color: white;
 }
 
-.submit-btn:hover {
-    opacity: 0.9;
-				   
-							  
+.submit-btn:hover, .btn-add:hover, #addItemForm button[type="submit"]:hover {
+    background-color: #2c3e50;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .cancel-btn {
-    background-color: #95a5a6;
-    color: white;
+    background-color: #e0e0e0;
+    color: #333333;
+    box-shadow: none;
 }
 
 .cancel-btn:hover {
-    background-color: #7f8c8d;
+    background-color: #cccccc;
 }
 
-.delete-btn {
+.delete-btn, .btn-reset {
     background-color: #e74c3c !important; 
     color: white;
 }
 
-.delete-btn:hover {
-    opacity: 0.9;
+.delete-btn:hover, .btn-reset:hover {
+    background-color: #c0392b !important;
 }
 
 .remove-btn {
     background-color: #2ecc71; 
-    color: rgb(255, 255, 255);
-					   
-								
-	 
-
-																				
-			  
-					
-					 
-						  
-												 
-					
-					  
-									   
-							
-							 
-	 
-
-					
-						 
-						  
-	 
-
-				  
-						
-	 
-
-					 
-					   
-				   
-						 
-				  
-	 
-	
-			   
-						  
-					  
-	 
-
-					  
-				   
-					  
-						
-				  
-	 
-
-																						 
-					
-					
-						  
-									  
-												   
-				  
-	 
-	
-						
-					   
-	 
+    color: white;
 }
-
 .remove-btn:hover {
     background-color: #27ae60;
-	
-						 
-					  
-							   
-							 
-	 
+}
 
-						 
-						   
-							
-	 
+.btn-save { 
+    background-color: #1abc9c; 
+    color: white; 
+}
+.btn-save:hover { background-color: #16a085; }
+.btn-save:disabled { background-color: #bdc3c7; cursor: not-allowed; }
 
-								
-							   
-				 
-	 
-	
-							 
-							 
-					 
-	 
-	
-							  
-			  
-							   
-							
-	 
-	
-					
-							
-					   
-	 
-	
-				  
-							 
-	 
-	
-					 
-								
-	 
+.btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+}
 
-			   
-						 
-						  
-	 
-
-							   
-				 
-						
-	 
-										 
-					 
-							   
-			   
-	 
-								 
-							
-	 
-	
-					
-						 
-					  
-	 
-	
-				   
-							   
-				  
-	 
+/* --- Read Only Input --- */
+.read-only { 
+    background-color: #f7f7f7 !important; 
+    font-weight: 500; 
+    color: #495057;
 }
 
 /* ====================================
-    8. RESPONSIVE DESIGN (Media Queries)
-    ==================================== */
+   8. ORDER SUMMARY & QUOTATION STYLES (Minimalist)
+   ==================================== */
 
-/* Tablet & Smaller Desktop (Max Width 1024px) */
-@media (max-width: 1024px) {
-    
-    .dashboard-layout {
-        flex-direction: column; 
+.summary-box { 
+    background-color: #fcfcfc; 
+    border: 1px solid #e0e0e0; 
+    color: #333; 
+    padding: 15px; 
+    border-radius: 6px; 
+    margin-top: 20px; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+.summary-box h3 { 
+    margin-top: 0; 
+    margin-bottom: 10px; 
+    font-size: 1.2em; 
+    color: #34495e; 
+    border-bottom: 1px solid #f0f0f0; 
+    padding-bottom: 5px; 
+    font-weight: 600;
+}
+
+.item-list { list-style: none; padding: 0; margin-bottom: 10px; }
+.item-list li { 
+    background: #ffffff; 
+    padding: 8px 10px; 
+    border-bottom: 1px solid #f7f7f7; 
+    font-size: 0.85em; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 3px solid #e0e0e0;
+    margin-bottom: 3px;
+    border-radius: 3px;
+}
+.item-list .price-info { font-weight: 600; color: #34495e; font-size: 1em; }
+
+.running-total { 
+    text-align: right; 
+    font-weight: 700; 
+    border-top: 1px solid #e0e0e0; 
+    padding-top: 8px; 
+    font-size: 1.1em;
+    color: #333333;
+}
+
+.delete-item-btn {
+    background: #95a5a6; 
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 0.75em;
+    transition: background-color 0.2s;
+}
+.delete-item-btn:hover { 
+    background: #e74c3c; 
+}
+
+/* ====================================
+   9. MODAL STYLES (สำหรับใบเสนอราคา - หน้าจอปกติ)
+   ==================================== */
+.quotation-modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.6); 
+    padding: 20px;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+}
+
+.quotation-modal-content {
+    background-color: #ffffff;
+    margin: 30px auto; 
+    padding: 30px; 
+    border: 1px solid #dcdcdc; 
+    width: 95%; 
+    max-width: 850px; 
+    border-radius: 8px; 
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); 
+    position: relative;
+    font-family: 'Sarabun', Arial, sans-serif;
+}
+
+.close-button {
+    color: #95a5a6; 
+    font-size: 36px; 
+    position: absolute;
+    top: 10px; 
+    right: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #c0392b; 
+}
+
+/* Header Section */
+.quotation-header {
+    border-bottom: 3px solid #3498db; 
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.quotation-header h2 {
+    font-size: 2.5em; 
+    color: #2c3e50; 
+    font-weight: 700; 
+    margin-bottom: 5px;
+}
+
+.quotation-header p {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin: 3px 0;
+}
+
+/* Customer/Job ID Block */
+.customer-block {
+    border-left: 5px solid #1abc9c; 
+    background-color: #f7f9f9; 
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+.customer-block p {
+    margin: 5px 0;
+    font-size: 1em;
+}
+.customer-block strong {
+    color: #34495e; 
+}
+
+
+/* Quotation Table */
+.quotation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+    border: 1px solid #e0e0e0; 
+}
+
+.quotation-table th {
+    background-color: #ecf0f1; 
+    color: #333; 
+    font-weight: 600;
+    padding: 12px 10px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+.quotation-table td {
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    vertical-align: top;
+}
+
+.quotation-table tbody tr:nth-child(even) {
+    background-color: #fcfcfc; 
+}
+
+.quotation-table .col-num {
+    text-align: right;
+}
+
+/* Total Summary Row */
+.quotation-table tfoot .total-row td {
+    background-color: #34495e; 
+    color: white; 
+    font-size: 1.3em; 
+    font-weight: 700;
+    padding: 15px 10px;
+    border: none;
+}
+
+/* Signature Block (หน้าจอปกติ) */
+.signature-block {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.signature-line {
+    border-bottom: 1px dashed #999;
+    width: 80%;
+    margin: 60px auto 10px auto; 
+}
+
+/* Action Buttons */
+.quotation-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.quotation-actions button {
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 600;
+}
+
+#printQuotationButton {
+    background-color: #3498db;
+    color: white;
+    border: none;
+}
+#printQuotationButton:hover {
+    background-color: #2980b9;
+}
+
+#startNewOrderButton {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+}
+#startNewOrderButton:hover {
+    background-color: #27ae60;
+}
+
+/* ====================================
+   10. PRINT MEDIA QUERIES (สำหรับจัด Format PDF)
+   ==================================== */
+@media print {
+    /* 1. Reset Global Styles */
+    body {
+        margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact;
+        font-family: 'Sarabun', Arial, sans-serif; 
+        color: #333;
+        font-size: 9pt; 
     }
 
-    /* Sidebar - เปลี่ยนเป็นแถบด้านบน */
-    .sidebar {
+    /* ซ่อนองค์ประกอบที่ไม่ต้องการให้พิมพ์ */
+    .dashboard-layout, .sidebar, .main-content, #order-input-view, 
+    .quotation-actions, .close-button, .modal::before {
+        display: none !important;
+    }
+
+    /* 2. จัดการ Modal Container (ใช้ Flexbox เพื่อ Footer ติดล่าง) */
+    .modal {
+        display: block !important;
+        position: static;
+        background: none;
         width: 100%;
         height: auto;
-        padding-top: 15px;
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-        z-index: 10;
+        overflow: visible;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    .quotation-modal-content {
+        width: 100% !important; 
+        max-width: 100% !important; 
+        margin: 0;
+        padding: 8mm 15mm; /* ขอบกระดาษ */
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        background-color: #fff;
+        box-sizing: border-box;
+        
+        /* ใช้ Flexbox เพื่อจัดการ Content และ Footer */
+        min-height: 100vh; 
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        justify-content: space-between; 
+    }
+
+    /* 3. จัดการ Layout และ Text ภายใน Quotation */
+    .quotation-main-content {
+        flex-grow: 1; 
+        display: block;
+    }
+
+    /* Header Section (ลดขนาด) */
+    .quotation-header {
+        padding-bottom: 5px; 
+        margin-bottom: 10px; 
+    }
+    .quotation-header h2 {
+        font-size: 18pt; 
+        margin-bottom: 1px; 
+    }
+    .quotation-header p {
+        font-size: 8pt; 
+    }
+    .quotation-header .company-info {
+        font-size: 7.5pt; 
+        line-height: 1.2;
+    }
+
+    /* Customer Block (ลดขนาด) */
+    .customer-block {
+        padding: 6px 12px; 
+        margin-bottom: 10px; 
+        font-size: 8.5pt; 
+        line-height: 1.4;
+    }
+
+    /* 4. ตารางใบเสนอราคา (คืนสี และลดขนาด) */
+    .quotation-table {
+        margin-bottom: 15px; 
+        font-size: 8.5pt; 
+        border: 1px solid #ddd;
+    }
+    .quotation-table th,
+    .quotation-table td {
+        border: 1px solid #ddd;
+        padding: 6px 8px;
+    }
+    .quotation-table th {
+        background-color: #f0f3f5; 
+        color: #333;
+        font-weight: bold;
+    }
+    .quotation-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9; 
+    }
+    .quotation-table .col-desc small {
+        font-size: 8pt;
+    }
+
+    /* ตารางสรุป Footer */
+    .quotation-table tfoot .total-row td {
+        background-color: #34495e !important; 
+        color: white !important; 
+        font-size: 10pt; 
+        font-weight: bold;
+    }
+    
+    /* 5. จัดการ Footer Block (หมายเหตุและลายเซ็น) */
+    .quotation-footer {
+        display: block; 
+        margin-top: 20px; 
+    }
+
+    /* หมายเหตุ */
+    .quotation-footer > p {
+        font-size: 7.5pt; 
+        margin-top: 10px;
+        color: #555;
+    }
+
+    /* ส่วนลายเซ็น */
+    .signature-block {
+        margin-top: 20px; 
+        font-size: 8.5pt; 
+    }
+    .signature-line {
+        margin: 30px auto 5px auto;
+    }
+}
+/* ====================================
+   11. NOTIFICATION MODAL STYLES (Minimalist)
+   ==================================== */
+.notification-modal {
+    background-color: rgba(0, 0, 0, 0.2); 
+    backdrop-filter: blur(2px);
+}
+
+.notification-content {
+    background-color: #ffffff;
+    margin: 8% auto; 
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 380px; 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.notification-icon {
+    font-size: 3em; 
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.notification-content h4 {
+    font-size: 1.4em;
+    font-weight: 600;
+    text-align: center;
+}
+
+.notification-content p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.notification-content .confirm-btn {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    box-shadow: none;
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Success & Error Styles */
+.notification-modal.success .notification-icon { color: #27ae60; }
+.notification-modal.success h4 { color: #218838; }
+.notification-modal.success .confirm-btn { background-color: #27ae60; color: white; }
+.notification-modal.success .confirm-btn:hover { background-color: #229954; }
+
+.notification-modal.error .notification-icon { color: #e74c3c; }
+.notification-modal.error h4 { color: #c0392b; }
+.notification-modal.error .confirm-btn { background-color: #e74c3c; color: white; }
+.notification-modal.error .confirm-btn:hover { background-color: #c0392b; }
+
+
+/* ====================================
+   12. RESPONSIVE DESIGN
+   ==================================== */
+/* Tablet & Smaller Desktop (Max Width 1024px) */
+@media (max-width: 1024px) {
+    /* Sidebar changes to top bar - Minimalist adjustments */
+    .sidebar {
+        width: 100%;
+        padding-top: 10px;
         padding-bottom: 10px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
     }
 
     .sidebar .logo {
-        margin-bottom: 0;
-        margin-left: 20px;
-    }
-
-    .sidebar nav {
-        padding: 0 20px;
-    }
-
-    .sidebar nav ul {
-        display: flex; 
-        padding: 0;
-        list-style: none;
-        margin: 0;
+        margin-left: 15px;
+        font-size: 1.4em;
     }
     
+    .logout-btn {
+        margin: 0 15px 0 0;
+    }
+
     .nav-item {
-        padding: 8px 15px;
-        margin: 0 5px;
+        padding: 8px 12px;
+        font-size: 0.85em;
     }
-
-    /* Main Content */
+    
     .main-content {
-        padding: 20px;
-        max-width: 100%;
-        order: 1; 
+        padding: 15px;
     }
 
-    /* Right Sidebar - ย้ายไปอยู่ด้านล่างสุด */
+    .schedule-table {
+        min-width: 800px;
+    }
+
     .right-sidebar {
         width: 100%;
-        border-left: none;
-        border-top: 1px solid #ecf0f1;
-        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
-        order: 2; 
+        padding: 15px 10px;
+        order: 3; /* ย้ายไปด้านล่าง */
     }
-    
-    .upcoming-job-item {
-        flex: 1 1 45%; 
+    .dashboard-layout {
+        flex-wrap: wrap;
     }
 }
 
 /* Mobile Devices (Max Width 640px) */
 @media (max-width: 640px) {
     
-    /* Header Controls */
+    /* Dashboard Header */
     .schedule-header {
+        padding: 10px;
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
     }
 
     .schedule-header h2 {
-        text-align: center;
-        margin-bottom: 15px;
+        font-size: 1.4em;
+        margin-bottom: 10px;
     }
 
     .schedule-header .controls {
-        flex-direction: column;
-        gap: 8px;
+        width: 100%;
+        gap: 6px;
+        justify-content: space-between;
     }
     
     .schedule-header button, 
     .schedule-header select {
-        width: 100%; 
+        padding: 8px;
+        font-size: 0.85em;
+        flex-grow: 1;
     }
     
-    /* Navigation on Mobile */
-    .sidebar {
-        flex-direction: column;
-        align-items: center;
+    /* Forms & Modal */
+    #order-input-view, .container { 
+        margin: 10px 5px; 
+        padding: 15px; 
+        width: auto;
     }
-    
-    .sidebar .logo {
-        margin-bottom: 10px;
-        margin-left: 0;
+    .modal-content { 
+        max-width: 95%; 
+        margin: 8% auto; 
+        padding: 15px; 
     }
-    
-    .sidebar nav {
-        padding: 0 10px 10px;
-    }
-    
-    .sidebar nav ul {
-        justify-content: center;
-    }
-
-    .nav-item {
-        font-size: 0.9em;
-        padding: 8px 10px;
-    }
-
-    /* Form Layout on Mobile */
-    .form-group {
-        flex: 1 1 100%; 
-    }
-    /* Make form rows stack vertically */
-    .form-group-row {
-        flex-direction: column;
-        gap: 0;
-    }
-    .form-group-row .form-group {
-        margin-bottom: 10px;
-    }
-    
-    .modal-content {
-        margin: 10% auto;
-        padding: 20px;
+    .two-cols {
+        grid-template-columns: 1fr;
     }
     
     .form-actions {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row;
+        gap: 8px;
+        justify-content: space-between;
     }
-}
-
-/* ====================================
-    9. NOTIFICATION MODAL STYLES (สำหรับแสดงผลลัพธ์)
-    ==================================== */
-
-.notification-modal {
-    display: none; /* เริ่มต้นซ่อนไว้ */
-    position: fixed;
-    z-index: 1001; /* สูงกว่า modal ทั่วไป */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    transition: opacity 0.3s;
-}
-
-.notification-content {
-    background-color: white;
-    margin: 15% auto; /* จัดให้อยู่กลางหน้าจอ */
-    padding: 30px;
-    border-radius: 10px;
-    width: 90%; 
-    max-width: 400px; /* จำกัดความกว้าง */
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    position: relative;
-    transform: translateY(-50px);
-    opacity: 0;
-    animation: fadeInDrop 0.5s forwards;
-}
-
-@keyframes fadeInDrop {
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.notification-icon {
-    font-size: 3.5em;
-    margin-bottom: 15px;
-    line-height: 1;
-}
-
-.notification-content h4 {
-    margin-top: 0;
-    font-size: 1.5em;
-    font-weight: 700;
-}
-
-.notification-content p {
-    font-size: 1em;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-.notification-content .confirm-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    min-width: 100px;
-}
-
-/* --- SUCCESS STYLES (สีเขียว) --- */
-.notification-modal.success .notification-icon {
-    color: #2ecc71; /* สีเขียว */
-}
-.notification-modal.success h4 {
-    color: #27ae60;
-}
-.notification-modal.success .confirm-btn {
-    background-color: #2ecc71;
-    color: white;
-}
-.notification-modal.success .confirm-btn:hover {
-    background-color: #27ae60;
-}
-
-/* --- ERROR STYLES (สีแดง) --- */
-.notification-modal.error .notification-icon {
-    color: #e74c3c; /* สีแดง */
-}
-.notification-modal.error h4 {
-    color: #c0392b;
-}
-.notification-modal.error .confirm-btn {
-    background-color: #e74c3c;
-    color: white;
-}
-.notification-modal.error .confirm-btn:hover {
-    background-color: #c0392b;
-}
-
-/* Mobile adjustments for notification */
-@media (max-width: 640px) {
-    .notification-content {
-        margin: 30% auto;
-        padding: 25px;
-    }
+    .form-actions button { width: auto; flex-grow: 1; }
 }

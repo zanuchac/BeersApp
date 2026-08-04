@@ -41,16 +41,18 @@ const generateOrderId = () => {
 
 // -------------------------------------------------------------------
 // HELPER: ฟังก์ชันคำนวณวันที่ทั้ง 7 วันในสัปดาห์ (เริ่มต้นจาก startDate)
+// *** แก้ไข: ปรับโครงสร้างเล็กน้อยเพื่อให้มั่นใจว่า Date Object ถูกสร้างใหม่และคำนวณวันที่ถูกต้อง ***
 // -------------------------------------------------------------------
 const getWeekDates = (startDate) => {
-    // ใช้วิธี map และสร้าง Date object ใหม่ทุกครั้งเพื่อป้องกันการ mutate ค่า
-    return daysOfWeek.map((_, index) => {
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+        // สร้าง Date Object ใหม่จากวันที่เริ่มต้น (วันจันทร์)
         const date = new Date(startDate); 
-        // ในการทำงานของ JS, date.setDate(value) จะถูกคำนวณจากวันที่ปัจจุบันของ date
-        // ซึ่ง date ถูกสร้างมาจาก startDate จึงเป็นวันจันทร์เสมอ
-        date.setDate(startDate.getDate() + index); 
-        return date;
-    });
+        // คำนวณวันที่ของวันถัดๆ ไปในสัปดาห์
+        date.setDate(startDate.getDate() + i); 
+        weekDates.push(date);
+    }
+    return weekDates;
 };
 
 
@@ -70,7 +72,6 @@ const showStatusModal = (title, message, isSuccess = true, onConfirm = null) => 
     const modalContent = document.createElement('div');
     modalContent.className = 'modal-content';
     // ปรับสี Modal ตามสถานะ (สำเร็จ/ผิดพลาด)
-																												
     const bgColor = isSuccess ? '#e6ffe6' : '#ffe6e6';
     const borderColor = isSuccess ? '#00a000' : '#a00000';
     const titleColor = isSuccess ? '#007000' : '#700000';
@@ -161,7 +162,7 @@ const renderUpcomingJobs = (filterValue = 'all') => {
         jobItem.className = `upcoming-job-item ${statusClass}`;
         jobItem.innerHTML = `
             <strong>#${job.id} - ${job.customer}</strong>
-            <span class="date-info">${job.date} | ${job.time} | ทีม ${job.team ? job.team.toUpperCase() : 'N/A'}</span>
+            <span class="date-info">${job.date} | ${String(job.time).substring(0, 5)} | ทีม ${job.team ? job.team.toUpperCase() : 'N/A'}</span>
             <span class="date-info status-text job-type-text">${job.jobType} | สถานะ: ${job.status.toUpperCase()}</span>
         `;
         upcomingJobsList.appendChild(jobItem);
@@ -174,19 +175,14 @@ const renderUpcomingJobs = (filterValue = 'all') => {
 };
 
 // -------------------------------------------------------------------
-// B. ฟังก์ชันสร้างตารางปฏิทินหลัก (Schedule Table) - ย้ายมา Global Scope
+// B. ฟังก์ชันสร้างตารางปฏิทินหลัก (Schedule Table)
+// *** แก้ไข: ปรับการกรองงานใน job.time ให้ใช้เพียง HH:MM ***
 // -------------------------------------------------------------------
 const renderSchedule = (startDate, filterValue = 'all') => {
     scheduleBody.innerHTML = ''; 
     
     // คำนวณวันที่ของแต่ละวันในสัปดาห์โดยใช้ Helper Function
-    const weekDates = getWeekDates(startDate);
-										 
-												  
-					
-	   
-        
-    
+    const weekDates = getWeekDates(startDate); 
     
     // อัปเดตช่วงวันที่แสดงใน Header
     const startDay = weekDates[0].toLocaleDateString('th-TH', { day: '2-digit', month: 'short' });
@@ -215,16 +211,20 @@ const renderSchedule = (startDate, filterValue = 'all') => {
         // สร้างเซลล์สำหรับแต่ละวันในสัปดาห์
         weekDates.forEach(date => {
             const dateString = formatDate(date);
-            const dayCell = row.insertCell();
-            
-            
+            const dayCell = row.insertCell(); 
             
             // กรองหางานที่ตรงกับ วันที่ และ ช่วงเวลา (ใช้ jobsData จริง)
-            const jobsInSlot = jobsData.filter(job => 
-                job.date === dateString && 
-                job.time === time && 
-                (filterValue === 'all' || job.team === filterValue)
-            );
+            const jobsInSlot = jobsData.filter(job => {
+                
+                // 1. ตัดส่วนเวลาจากฐานข้อมูลให้เหลือ HH:MM (09:00:00 -> 09:00)
+                const jobTimeHHMM = job.time ? String(job.time).substring(0, 5) : '';
+                
+                return (
+                    job.date === dateString && 
+                    jobTimeHHMM === time && // <-- เปรียบเทียบกับ HH:MM ที่ปรับแล้ว
+                    (filterValue === 'all' || job.team === filterValue)
+                );
+            });
             
             jobsInSlot.forEach(job => {
                 const jobDiv = document.createElement('div');
@@ -245,25 +245,10 @@ const renderSchedule = (startDate, filterValue = 'all') => {
             });
         });
     });
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        
     // เรียกใช้ฟังก์ชันแสดงงานที่กำลังจะมาถึง
     renderUpcomingJobs(filterValue); 
 };
-            
             
             
             
@@ -392,7 +377,8 @@ const openJobModal = async (mode = 'add', jobData = {}) => {
                     form.elements['orderId'].value = jobData.id; // ใช้ ID เป็น OrderId ด้วย (ตามโครงสร้าง Mock Data)
                     form.elements['customerName'].value = jobData.customer || '';
                     form.elements['appointmentDate'].value = jobData.date || ''; 
-                    form.elements['appointmentTime'].value = jobData.time || '';
+                    // ตัดส่วนเวลาให้เหลือ HH:MM ก่อนแสดงในฟอร์ม
+                    form.elements['appointmentTime'].value = jobData.time ? String(jobData.time).substring(0, 5) : ''; 
                     form.elements['address'].value = jobData.address || '';
                     form.elements['team'].value = jobData.team || 'team-a';
                     form.elements['jobType'].value = jobData.jobType || 'ติดตั้ง';
@@ -450,7 +436,7 @@ const handleFormSubmission = (form) => {
         e.preventDefault();
         
         const formData = new FormData(form);
-                                            
+        
         const data = Object.fromEntries(formData.entries());
         
         // ตรวจสอบว่ามี jobId ไหม ถ้ามี คือโหมดแก้ไข (Update)
@@ -498,7 +484,6 @@ const handleFormSubmission = (form) => {
                     successMsg, 
                     true, 
                     // Callback เมื่อกด OK: ดึงข้อมูลใหม่และ Refresh UI
-                                            
                     () => reloadDataAndRefreshView(currentMonday, teamFilter.value)
                 );
             } else {
@@ -590,12 +575,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = document.querySelector('.add-btn'); 
     
     // 2. Calculate initial currentMonday 
-                                        
-                                        
-                                            
     
     currentMonday = new Date(); 
-                                        
+    
     // หาจุดเริ่มต้นของสัปดาห์ (วันจันทร์)
     // getDay() คือ 0=อาทิตย์, 1=จันทร์, ...
     // การคำนวณนี้จะตั้งค่าเป็นวันจันทร์ของสัปดาห์ปัจจุบันเสมอ
@@ -603,125 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Setup Event Listeners
     
-    
- 
-   
-
-  
- 
-  
-   
-  
-
-   
-  
-
-  
-   
-  
-   
-
-  
- 
-   
- 
- 
-   
-  
-  
-  
-   
-
-
- 
- 
- 
-   
-
-  
- 
- 
- 
-   
- 
-   
- 
-   
-  
-  
-  
-  
-   
-
-  
-   
-  
- 
- 
-  
-  
-  
-   
-   
-   
-  
-
-   
-   
-   
- 
-  
- 
-   
-  
-  
- 
-  
- 
-  
-
-  
-  
- 
-   
-   
- 
- 
-
-   
-   
- 
- 
-
-  
- 
-  
-  
-  
-   
- 
- 
-  
-   
-  
-  
- 
-  
-  
- 
- 
-   
- 
-   
-  
-  
-  
-  
-   
-
-  
- 
-  
 
     // ควบคุมการเปลี่ยนสัปดาห์
     document.getElementById('prev-week-btn').addEventListener('click', () => {
@@ -746,42 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             
             
-    
             
-            
-    
-            
-    
-            
- 
-  
-   
-  
- 
- 
- 
-  
-   
-  
-  
-	
-  
-  
-   
- 
-	
- 
-
-	 
-   
-   
- 
-
-  
-  
-	
-	  
- 
         });
     }
 
